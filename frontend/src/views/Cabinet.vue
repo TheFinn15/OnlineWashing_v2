@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-card style="margin: 8% 15% 0 15%">
+    <v-card v-if="authSuccess" style="margin: 8% 15% 0 15%">
       <v-tabs grow color="indigo">
         <v-tab>{{curLocale.tabsNames[0]}}</v-tab>
         <v-tab>{{curLocale.tabsNames[1]}}</v-tab>
@@ -20,16 +20,22 @@
                   <b>{{curLocale.tabItems[0].userInfo[2]}}</b> {{info.userInfo.login}} <br/>
                   <b>{{curLocale.tabItems[0].userInfo[3]}}</b> {{info.userInfo.email}} <br/>
                   <b>{{curLocale.tabItems[0].userInfo[4]}}</b> {{info.userInfo.phone}} <br/>
-<!--                  <b>{{curLocale.tabItems[0].userInfo[5]}}</b> {{info.userInfo.balance}}-->
                 </v-card-text>
               </v-col>
             </v-row>
           </v-container>
           <v-divider></v-divider>
           <v-card flat>
-            <v-card-title>{{curLocale.tabItems[0].curOrders.title}}</v-card-title>
+            <v-card-title>
+              {{curLocale.tabItems[0].curOrders.title}}
+              <v-spacer></v-spacer>
+              <v-card-subtitle v-if="info.userInfo.machine.length <= 0" style="justify-content: center">
+                <v-icon small style="text-align: center;display: block">warning</v-icon>
+                {{curLocale.tabItems[0].curOrders.ordersIsEmptyTitle}}
+              </v-card-subtitle>
+            </v-card-title>
             <v-divider></v-divider>
-            <v-list v-if="info.userInfo.machine !== null">
+            <v-list v-if="info.userInfo.machine.length > 0">
               <v-list-group v-for="(item, i) in info.userInfo.machine" :key="i">
                 <template v-slot:activator>
                     <v-list-item-title>
@@ -59,14 +65,10 @@
                 </v-list-item>
               </v-list-group>
             </v-list>
-            <div v-else style="margin: 10%">
-              <v-icon style="text-align: center;display: block">warning</v-icon>
-              <v-card-title style="justify-content: center">{{curLocale.tabItems[0].curOrders.ordersIsEmptyTitle}}</v-card-title>
-            </div>
           </v-card>
         </v-tab-item>
         <v-tab-item>
-          <v-list v-if="info.drafts !== null">
+          <v-list v-if="info.drafts.length > 0">
             <v-card-title>{{curLocale.tabItems[1].title}}</v-card-title>
             <v-divider></v-divider>
             <v-list-group v-for="(item, i) in info.drafts" :key="i">
@@ -196,11 +198,17 @@
         </v-tab-item>
       </v-tabs>
     </v-card>
+    <v-card v-else style="margin: 8% 15% 0 15%; padding: 5%">
+      <v-icon style="justify-content: center; display: flex">warning</v-icon>
+      <v-card-title style="text-align: center; display: block">
+        Отказано в доступе
+      </v-card-title>
+    </v-card>
   </v-app>
 </template>
 
 <script>
-const ip = "192.168.0.113"
+const ip = "192.168.0.112"
 const port = "9000"
 const axios = require('axios')
 export default {
@@ -209,7 +217,7 @@ export default {
     return {
       info: {
         userInfo: null,
-        drafts: null,
+        drafts: null
       },
       phoneRules: [
         v => v.length === 10 || this.curLocale.tabItems[2].editForm.rulePhoneText
@@ -391,6 +399,7 @@ export default {
           ]
         }
       },
+      authSuccess: false
     }
   },
   methods: {
@@ -412,13 +421,21 @@ export default {
     }
   },
   mounted() {
-    axios.get(`http://${ip}:${port}/api/persons/1`)
+    axios.get(`http://${ip}:${port}/api/persons/`)
       .then(resp => {
-        this.info.userInfo = resp.data
-        axios.get(`http://${ip}:${port}/api/drafts`)
+        console.log(localStorage.getItem('uid'))
+        let info = resp.data.filter(i => i.sessionId === localStorage.getItem('uid'))
+        console.log('sa', info)
+        if (info.length > 0) {
+          this.info.userInfo = info[0]
+          axios.get(`http://${ip}:${port}/api/drafts`)
             .then(resp1 => {
-              this.info.drafts = resp1.data.filter(i => i.person.id === resp.data.id);
-            })
+              this.info.drafts = resp1.data.filter(i => i.person.id === this.info.userInfo.id);
+          })
+          this.authSuccess = true
+        } else {
+          this.authSuccess = false
+        }
       })
   }
 }

@@ -316,7 +316,7 @@
 <script>
 import PersonsList from "@/components/tables/PersonsList";
 import MachineList from "@/components/tables/MachineList";
-const ip = "192.168.0.153"
+const ip = "192.168.0.112"
 const port = '9000'
 const axios = require('axios')
 

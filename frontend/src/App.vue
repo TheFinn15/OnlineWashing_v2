@@ -413,20 +413,22 @@
       }
     },
     mounted() {
-      if (localStorage.getItem('uid') !== null) {
+      if (localStorage.getItem('uid') !== undefined) {
         axios.get(`http://${ip}:${port}/api/persons`)
           .then(resp => {
             let uId = resp.data.filter(i => i.sessionId === localStorage.getItem('uid'))
-            uId = uId[uId.length-1].id
-            let req = new XMLHttpRequest()
-            req.open('GET', `http://${ip}:${port}/api/persons/${uId}`)
-            req.send()
-            req.onload = () => {
-              this.info.userInfo = JSON.parse(req.responseText)
-              if (this.info.userInfo.wallet.balance === null || this.info.userInfo.wallet.balance === 0 || this.info.userInfo.wallet.balance === undefined) {
-                this.info.userInfo.wallet.balance =  "00, 00"
-              } else {
-                this.info.userInfo.wallet.balance = this.info.userInfo.wallet.balance.toString() + ", 00";
+            if (uId.length > 0) {
+              uId = uId[uId.length-1].id
+              let req = new XMLHttpRequest()
+              req.open('GET', `http://${ip}:${port}/api/persons/${uId}`)
+              req.send()
+              req.onload = () => {
+                this.info.userInfo = JSON.parse(req.responseText)
+                if (this.info.userInfo.wallet.balance === null || this.info.userInfo.wallet.balance === 0 || this.info.userInfo.wallet.balance === undefined) {
+                  this.info.userInfo.wallet.balance =  "00, 00"
+                } else {
+                  this.info.userInfo.wallet.balance = this.info.userInfo.wallet.balance.toString() + ", 00";
+                }
               }
             }
           })
