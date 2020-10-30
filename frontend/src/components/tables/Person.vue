@@ -96,19 +96,14 @@ export default {
   props: ['person', 'modeEdit', 'modeDel', 'updater'],
   methods: {
     showEditForm() {
-      console.log('here')
       this.updater(
           {infoItem:this.person, showEdit: true, showDel: false}
       )
-      // this.itemInfo = this.curPerson;
-      // this.showEdit = true;
     },
     showDelForm() {
       this.updater(
           {infoItem:this.person, showEdit: false, showDel: true}
       )
-      // this.itemInfo = this.curPerson;
-      // this.showDel = true;
     }
   }
 }

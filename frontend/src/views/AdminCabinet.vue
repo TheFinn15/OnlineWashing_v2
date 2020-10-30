@@ -100,6 +100,17 @@
                   v-if="chosenTable === 'Machines'"
                   style="overflow-y: scroll; height: 100%"
               />
+              <StockList
+                  :updater="updater"
+                  :show-edit="showEditForm"
+                  :show-del="showDelForm"
+                  :item-info="forms.stocks"
+                  :table-info="chosenTableInfo"
+                  :mode-del="modeDel"
+                  :mode-edit="modeEdit"
+                  v-if="chosenTable === 'Stocks'"
+                  style="overflow-y: scroll; height: 100%"
+              />
             </v-card>
           </v-dialog>
           <v-dialog max-width="1000" persistent v-model="showAddForm">
@@ -227,6 +238,66 @@
                       </v-col>
                     </v-row>
                   </v-container>
+                  <v-container v-if="chosenTable === 'Stocks'">
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            label="Название акции"
+                            outlined
+                            :rules="rulesText"
+                            required
+                            v-model="forms.stocks.name"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-text-field
+                            label="Спонсор акции"
+                            outlined
+                            :rules="rulesText"
+                            required
+                            v-model="forms.stocks.sponsor"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            label="Скидка в %"
+                            type="number"
+                            outlined
+                            :rules="rulesNum"
+                            required
+                            v-model="forms.stocks.discount"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-menu
+                            v-model="menuChooseDate"
+                            :close-on-content-click="false"
+                            offset-y
+                            transition='scale-transition'
+                            max-width="100%"
+                        >
+                          <template v-slot:activator="{on, attrs}">
+                            <v-text-field
+                                v-model="forms.stocks.lastTerm"
+                                label="Дата истечения акции"
+                                persistent-hint
+                                prepend-icon="mdi-calendar"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker
+                              v-model="chosenDate"
+                              no-title
+                              @input="reFormateDate"
+                          ></v-date-picker>
+                        </v-menu>
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-tab-item>
                 <v-tab-item>
                   <v-container v-if="chosenTable === 'Persons'">
@@ -247,6 +318,20 @@
                         <v-checkbox v-for="(item, i) in editForm.stocks" :label="item.name + ' ' + item.sponsor + ' ' + item.lastTerm" :key="i"></v-checkbox>
                       </div>
                       <v-checkbox v-else readonly label="Акции отсутствуют"></v-checkbox>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'Stocks'" style="padding: 4%; overflow: hidden">
+                    <v-row>
+                      <v-col>
+                        <div>
+                          <v-icon large style="text-align: center; display: block">
+                            warning
+                          </v-icon>
+                          <v-card-title style="text-align: center; display: block">
+                            Отсутствуют
+                          </v-card-title>
+                        </div>
+                      </v-col>
                     </v-row>
                   </v-container>
                 </v-tab-item>
@@ -411,6 +496,54 @@
                       </v-col>
                     </v-row>
                   </v-container>
+                  <v-container v-if="chosenTable === 'Stocks'">
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            label="Название акции"
+                            outlined
+                            :rules="rulesText"
+                            :placeholder="editForm.stocks.name"
+                            required
+                            v-model="forms.stocks.name"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-text-field
+                            label="Спонсор акции"
+                            outlined
+                            :rules="rulesText"
+                            :placeholder="editForm.stocks.sponsor"
+                            required
+                            v-model="forms.stocks.sponsor"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            label="Скидка в %"
+                            type="number"
+                            outlined
+                            :rules="rulesNum"
+                            :placeholder="editForm.stocks.discount"
+                            required
+                            v-model="forms.stocks.discount"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-date-picker
+                            elevation="15"
+                            color="indigo"
+                            v-model="forms.stocks.lastTerm"
+                            full-width
+                            landscape
+                        >
+                          Дата истечения
+                        </v-date-picker>
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-tab-item>
                 <v-tab-item>
                   <v-container v-if="chosenTable === 'Persons'">
@@ -431,6 +564,20 @@
                         <v-checkbox v-for="(item, i) in forms.machines.stock" :label="item.name + ' ' + item.sponsor + ' ' + item.lastTerm" :key="i"></v-checkbox>
                       </div>
                       <v-checkbox v-else readonly label="Акции отсутствуют"></v-checkbox>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'Stocks'">
+                    <v-row>
+                      <v-col>
+                        <div>
+                          <v-icon large style="text-align: center; display: block">
+                            warning
+                          </v-icon>
+                          <v-card-title style="text-align: center; display: block">
+                            Отсутствуют
+                          </v-card-title>
+                        </div>
+                      </v-col>
                     </v-row>
                   </v-container>
                 </v-tab-item>
@@ -462,15 +609,17 @@
 <script>
 import PersonsList from "@/components/tables/PersonsList";
 import MachineList from "@/components/tables/MachineList";
+import StockList from "@/components/tables/StockList";
 const ip = "192.168.0.153"
 const port = '9000'
 const axios = require('axios')
 
 export default {
   name: "AdminCabinet",
-  components: {MachineList, PersonsList},
+  components: {StockList, MachineList, PersonsList},
   data() {
     return {
+      chosenDate: new Date().toISOString().substr(0, 10),
       searchTextChosenTable: null,
       tablesInfo: {
         tablesName: [
@@ -502,6 +651,7 @@ export default {
       showDelForm: false,
       modeEdit: false,
       modeDel: false,
+      menuChooseDate: false,
       editForm: {
         machines: [],
         persons: [],
@@ -578,6 +728,12 @@ export default {
     }
   },
   methods: {
+    reFormateDate() {
+      const [year, month, day] = this.chosenDate.split('-')
+      this.forms.stocks.lastTerm = `${month}/${day}/${year}`;
+      this.menuChooseDate = false;
+
+    },
     doCloseTable() {
       this.fullInfo = false
       this.chosenTable = null
