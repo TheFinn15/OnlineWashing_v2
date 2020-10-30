@@ -6,13 +6,6 @@
         <v-tab>Отчеты</v-tab>
         <v-tab>Статистика</v-tab>
         <v-tab-item>
-          <v-text-field
-              style="margin: 2%"
-              full-width
-              label="Введите запрос"
-              append-icon="search"
-              outlined
-          ></v-text-field>
           <v-card-title>Управление данными</v-card-title>
           <v-divider></v-divider>
           <v-container>
@@ -31,12 +24,12 @@
               </v-col>
             </v-row>
           </v-container>
-          <v-dialog max-width="650" persistent v-model="fullInfo" v-if="chosenTable !== null">
+          <v-dialog scrollable max-width="650" persistent v-model="fullInfo" v-if="chosenTable !== null">
             <v-card>
               <v-card-title>
                 Управление {{ chosenTable }}
                 <v-spacer></v-spacer>
-                <v-btn icon @click="fullInfo = false">
+                <v-btn icon @click="doCloseTable">
                   <v-icon>
                     close
                   </v-icon>
@@ -45,11 +38,16 @@
               <v-text-field
                   style="margin: 2%"
                   full-width
+                  v-model="searchTextChosenTable"
                   :label="'Введите запрос к ' + chosenTable"
                   append-icon="search"
+                  @input="doSearchInTable"
                   outlined
               ></v-text-field>
-              <v-snackbar top text timeout="2000" v-model="alertSuccess" color="success">
+              <v-snackbar top timeout="2000" v-model="alertSuccess" color="success">
+                {{alertText}}
+              </v-snackbar>
+              <v-snackbar top timeout="2000" v-model="alertErr" color="error">
                 {{alertText}}
               </v-snackbar>
               <v-divider></v-divider>
@@ -89,6 +87,7 @@
                   :mode-del="modeDel"
                   :mode-edit="modeEdit"
                   v-if="chosenTable === 'Persons'"
+                  style="overflow-y: scroll; height: 100%"
               />
               <MachineList
                   :updater="updater"
@@ -99,6 +98,7 @@
                   :mode-del="modeDel"
                   :mode-edit="modeEdit"
                   v-if="chosenTable === 'Machines'"
+                  style="overflow-y: scroll; height: 100%"
               />
             </v-card>
           </v-dialog>
@@ -118,7 +118,7 @@
                 <v-tab>Обязательные поля</v-tab>
                 <v-tab>Необязательные поля</v-tab>
                 <v-tab-item>
-                  <v-container>
+                  <v-container v-if="chosenTable === 'Persons'">
                     <v-row>
                       <v-col>
                         <v-row>
@@ -173,17 +173,80 @@
                       </v-col>
                     </v-row>
                   </v-container>
+                  <v-container v-if="chosenTable === 'Machines'">
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            label="Название машины"
+                            outlined
+                            :rules="rulesText"
+                            required
+                            v-model="forms.machines.name"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-text-field
+                            label="Описание"
+                            outlined
+                            :rules="rulesText"
+                            required
+                            v-model="forms.machines.description"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            label="Вместимость в л."
+                            type="number"
+                            outlined
+                            :rules="rulesNum"
+                            required
+                            v-model="forms.machines.capacity"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-text-field
+                            label="Цена в грн."
+                            type="number"
+                            outlined
+                            :rules="rulesNum"
+                            required
+                            v-model="forms.machines.price"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-select
+                            label="Статус машины"
+                            outlined
+                            :items="['Рабочая', 'Не работает']"
+                            v-model="forms.machines.status"
+                        ></v-select>
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-tab-item>
                 <v-tab-item>
-                  <v-container>
+                  <v-container v-if="chosenTable === 'Persons'">
                     <v-row>
                       <v-col>
                         <v-card-subtitle>Доступные машини:</v-card-subtitle>
                         <div v-if="editForm.machines.length > 0 ">
                           <v-checkbox v-for="(item, i) in editForm.machines" :label="item.name + ' ' + item.capacity" :key="i"></v-checkbox>
                         </div>
-                        <v-checkbox readonly label="Машини отсутствуют"></v-checkbox>
+                        <v-checkbox v-else readonly label="Машини отсутствуют"></v-checkbox>
                       </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'Machines'">
+                    <v-row>
+                      <v-card-subtitle>Доступные акции сервиса:</v-card-subtitle>
+                      <div v-if="editForm.stocks.length > 0 ">
+                        <v-checkbox v-for="(item, i) in editForm.stocks" :label="item.name + ' ' + item.sponsor + ' ' + item.lastTerm" :key="i"></v-checkbox>
+                      </div>
+                      <v-checkbox v-else readonly label="Акции отсутствуют"></v-checkbox>
                     </v-row>
                   </v-container>
                 </v-tab-item>
@@ -208,7 +271,7 @@
                 <v-tab>Обязательные поля</v-tab>
                 <v-tab>Необязательные поля</v-tab>
                 <v-tab-item>
-                  <v-container>
+                  <v-container v-if="chosenTable === 'Persons'">
                     <v-row>
                       <v-col>
                         <v-img width="200" height="185" :src="forms.persons.avatar"></v-img>
@@ -274,9 +337,83 @@
                       </v-col>
                     </v-row>
                   </v-container>
+                  <v-container v-if="chosenTable === 'Machines'">
+                    <v-row>
+                      <v-col title="Картинка машины" cols="5">
+                        <v-row no-gutters align="end" justify="end">
+                          <v-col>
+                            <v-img v-model="forms.machines.img" :src="forms.machines.img" width="150" height="150" style="border: 1px solid black"></v-img>
+                          </v-col>
+                          <v-col>
+                            <v-file-input
+                                hide-input
+                                @change="loadImg"
+                            ></v-file-input>
+                          </v-col>
+                        </v-row>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            label="Название машины"
+                            outlined
+                            :rules="rulesText"
+                            required
+                            :placeholder="editForm.machines.name"
+                            v-model="forms.machines.name"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-text-field
+                            label="Описание"
+                            outlined
+                            :rules="rulesText"
+                            required
+                            :placeholder="editForm.machines.description"
+                            v-model="forms.machines.description"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            label="Вместимость в л."
+                            type="number"
+                            outlined
+                            :rules="rulesNum"
+                            required
+                            :placeholder="editForm.machines.capacity"
+                            v-model="forms.machines.capacity"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-text-field
+                            label="Цена в грн."
+                            type="number"
+                            outlined
+                            :rules="rulesNum"
+                            required
+                            :placeholder="editForm.machines.price"
+                            v-model="forms.machines.price"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-select
+                            label="Статус машины"
+                            outlined
+                            :items="['Рабочая', 'Не работает']"
+                            :placeholder="editForm.machines.status"
+                            v-model="forms.machines.status"
+                        ></v-select>
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-tab-item>
                 <v-tab-item>
-                  <v-container>
+                  <v-container v-if="chosenTable === 'Persons'">
                     <v-row>
                       <v-col>
                         <v-card-subtitle>Доступные машини:</v-card-subtitle>
@@ -285,6 +422,15 @@
                         </div>
                         <v-checkbox readonly label="Машини отсутствуют"></v-checkbox>
                       </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'Machines'">
+                    <v-row>
+                      <v-card-subtitle>Акции текущей машины:</v-card-subtitle>
+                      <div v-if="forms.machines.stock !== null">
+                        <v-checkbox v-for="(item, i) in forms.machines.stock" :label="item.name + ' ' + item.sponsor + ' ' + item.lastTerm" :key="i"></v-checkbox>
+                      </div>
+                      <v-checkbox v-else readonly label="Акции отсутствуют"></v-checkbox>
                     </v-row>
                   </v-container>
                 </v-tab-item>
@@ -316,7 +462,7 @@
 <script>
 import PersonsList from "@/components/tables/PersonsList";
 import MachineList from "@/components/tables/MachineList";
-const ip = "192.168.0.112"
+const ip = "192.168.0.153"
 const port = '9000'
 const axios = require('axios')
 
@@ -325,6 +471,7 @@ export default {
   components: {MachineList, PersonsList},
   data() {
     return {
+      searchTextChosenTable: null,
       tablesInfo: {
         tablesName: [
           'Persons', 'Machines', 'Stocks', 'Drafts', 'Wallets', 'HistoryTransactions'
@@ -362,6 +509,9 @@ export default {
         histories: [],
         stocks: []
       },
+      rulesNum: [
+        v => v > 0 || 'Число должно быть больше 0'
+      ],
       rulesText: [
           v => v.length > 0 || 'Это поле не может быть пустым'
       ],
@@ -383,10 +533,18 @@ export default {
           pwd: '',
           phone: '',
           avatar: '',
-          machine: ''
+          machine: '',
+          wallet: {
+            historyTransactions: '',
+            balance: ''
+          }
         },
         machines: {
-          stock: '',
+          stock: {
+            sponsor: '',
+            discount: '',
+            lastTerm: ''
+          },
           name: '',
           capacity: '',
           description: '',
@@ -420,15 +578,85 @@ export default {
     }
   },
   methods: {
+    doCloseTable() {
+      this.fullInfo = false
+      this.chosenTable = null
+      this.chosenTableInfo = null
+    },
+    doSearchInTable() {
+      let regex = new RegExp(this.searchTextChosenTable, 'i')
+      if (this.chosenTable === 'Persons') {
+        axios({
+          method: 'GET',
+          url: `http://${ip}:${port}/api/persons`
+        }).then(resp => {
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.fName + ' ' + i.sName || i.fName || i.sName))
+        })
+      }
+      else if (this.chosenTable === 'Machines') {
+        axios({
+          method: 'GET',
+          url: `http://${ip}:${port}/api/persons`
+        }).then(resp => {
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.name))
+        })
+      }
+      else if (this.chosenTable === 'Drafts') {
+        axios({
+          method: 'GET',
+          url: `http://${ip}:${port}/api/persons`
+        }).then(resp => {
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.paymentType))
+        })
+      }
+      else if (this.chosenTable === 'Wallets') {
+        axios({
+          method: 'GET',
+          url: `http://${ip}:${port}/api/persons`
+        }).then(resp => {
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.balance))
+        })
+      }
+      else if (this.chosenTable === 'Histories') {
+        axios({
+          method: 'GET',
+          url: `http://${ip}:${port}/api/persons`
+        }).then(resp => {
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.sum || i.date))
+        })
+      }
+      else if (this.chosenTable === 'Stocks') {
+        axios({
+          method: 'GET',
+          url: `http://${ip}:${port}/api/persons`
+        }).then(resp => {
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.name || i.sponsor || i.discount))
+        })
+      }
+      else {
+        axios({
+          method: 'GET',
+          url: `http://${ip}:${port}/api/${this.chosenTable.toLowerCase()}`
+        }).then(resp => {
+          this.chosenTableInfo = resp.data
+        })
+      }
+    },
     updater(info) {
       this.forms[this.chosenTable.toLowerCase()] = info.infoItem
-        if (info.showEdit) this.showEditForm = true
-        else if (info.showDel) this.showDelForm = true
+      if (info.showEdit) this.showEditForm = true
+      else if (info.showDel) this.showDelForm = true
     },
     loadImg(ev) {
       let reader = new FileReader()
-      reader.onload = (e) => {
-        this.forms[this.chosenTable.toLowerCase()].avatar = e.target.result
+      if (this.chosenTable === 'Persons') {
+        reader.onload = (e) => {
+          this.forms[this.chosenTable.toLowerCase()].avatar = e.target.result
+        }
+      } else {
+        reader.onload = (e) => {
+          this.forms[this.chosenTable.toLowerCase()].img = e.target.result
+        }
       }
       reader.readAsDataURL(ev);
     },
@@ -436,8 +664,9 @@ export default {
       try {
         let table = this.chosenTable
         let curForms = this.forms[table.toLowerCase()]
+        if (table === 'Persons' && curForms.machine === '') curForms.machine = null
+        if (table === 'Machines' && curForms.stock === '') curForms.stock = null
         console.log('info', curForms)
-        if (curForms.machine === '') curForms.machine = []
         axios({
           method: "POST",
           url: `http://${ip}:${port}/api/${table.toLowerCase()}`,
@@ -445,14 +674,22 @@ export default {
         }).then(resp => {
           console.log(resp)
           this.chosenTableInfo.push(resp.data)
-        })
-        for (let item of Object.keys(this.forms[table.toLowerCase()])) {
-          this.forms[table.toLowerCase()][item] = '';
-        }
-        this.$nextTick(() => {
-          this.showAddForm = false;
-          this.alertSuccess = true;
-          this.alertText = 'Успешно добавлена запись';
+
+          this.$nextTick(() => {
+            this.showAddForm = false;
+            this.alertSuccess = true;
+            this.alertText = 'Успешно добавлена запись';
+          })
+
+          for (let item of Object.keys(this.forms[table.toLowerCase()])) {
+            this.forms[table.toLowerCase()][item] = '';
+          }
+        }).catch(err => {
+          console.log(err)
+          this.$nextTick(() => {
+            this.alertErr = true;
+            this.alertText = 'Ошибка сервера';
+          })
         })
       } catch (e) {
         console.log('err', e)
@@ -497,18 +734,21 @@ export default {
         axios({
           method: "DELETE",
           url: `http://${ip}:${port}/api/${table.toLowerCase()}/${curItem}`
-        }).then(resp => console.log(resp))
-        this.fullInfo = false
+        }).then(resp => {
+          console.log(resp.data.info)
+        })
+
+        this.chosenTableInfo = this.chosenTableInfo.filter(i => i.id !== curItem)
+
         for (let item of Object.keys(this.forms[table.toLowerCase()])) {
           this.forms[table.toLowerCase()][item] = '';
         }
+
         this.$nextTick(() => {
-          this.chosenTableInfo = this.chosenTableInfo.filter(i => i.id !== curItem)
           this.showDelForm = false;
           this.alertSuccess = true;
           this.alertText = 'Запись успешно удалена'
         })
-        this.mounted();
       } catch (e) {
         console.log('err', e)
         this.$nextTick(() => {
@@ -517,12 +757,17 @@ export default {
       }
     },
     handleTable(ev) {
-      this.fullInfo = true;
-      this.chosenTable = ev.path[0].offsetParent.offsetParent.attributes.getNamedItem('name').value || ev.path[0].offsetParent.attributes.getNamedItem('name').value
-      axios({
-        method: 'GET',
-        url: `http://${ip}:${port}/api/${this.chosenTable.toLowerCase()}`,
-      }).then(resp => (this.chosenTableInfo = resp.data))
+      try {
+        this.fullInfo = true;
+        this.chosenTable = ev.path[0].offsetParent.offsetParent.attributes.getNamedItem('name').value || ev.path[0].offsetParent.attributes.getNamedItem('name').value
+        axios({
+          method: 'GET',
+          url: `http://${ip}:${port}/api/${this.chosenTable.toLowerCase()}`,
+        }).then(resp => (this.chosenTableInfo = resp.data))
+      }
+      catch {
+        console.log()
+      }
     }
   },
   mounted() {

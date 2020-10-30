@@ -275,7 +275,7 @@
 </template>
 
 <script>
-  const ip = "192.168.0.112"
+  const ip = "192.168.0.153"
   const port = "9000"
   const axios = require('axios')
   export default {
@@ -283,7 +283,18 @@
     data() {
       return {
         info: {
-          userInfo: null
+          userInfo: {
+            fName: '',
+            sName: '',
+            login: '',
+            email: '',
+            pwd: '',
+            phone: '',
+            avatar: '',
+            wallet: {
+              balance: ''
+            }
+          }
         },
         form: {
           fName: '',

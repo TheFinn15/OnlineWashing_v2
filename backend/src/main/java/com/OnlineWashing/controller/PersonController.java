@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -45,6 +46,7 @@ public class PersonController {
             Wallet newWallet = new Wallet();
             LocalDateTime dateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH:mm:ss");
+            if (person.getMachine() == null) person.setMachine(new ArrayList<>());
             newWallet.setLastUpdateRow(dateTime.format(formatter));
             newWallet.setBalance(0L);
             walletRepo.save(newWallet);

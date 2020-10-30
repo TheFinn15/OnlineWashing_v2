@@ -39,13 +39,13 @@
     <v-list-group sub-group no-action>
       <template v-slot:activator>
         <v-list-item-content>
-          <v-list-item-title>ID: {{person.wallet.id}} | {{person.wallet.balance === null?info.wallet.balance:0}} UAH</v-list-item-title>
+          <v-list-item-title>Кошелек | ID: {{person.wallet.id}} | {{person.wallet.balance === null?info.wallet.balance:0}} UAH</v-list-item-title>
         </v-list-item-content>
       </template>
       <v-list-group sub-group no-action v-if="person.wallet.historyTransactions.length > 0">
         <template v-slot:activator>
           <v-list-item-content>
-            <v-list-item-title v-if="person.wallet.historyTransactions !== null">История пополнений</v-list-item-title>
+            <v-list-item-title>История пополнений</v-list-item-title>
           </v-list-item-content>
         </template>
         <v-list-item-group v-for="(history, j) in person.wallet.historyTransactions" :key="j">

@@ -1,6 +1,6 @@
 <template>
   <v-card max-width="220">
-    <v-badge :color="machine.status">
+    <v-badge :color="getStatusMachine">
       <v-img :src="machine.img" width="220" height="220"></v-img>
     </v-badge>
     <v-list>
@@ -34,6 +34,12 @@ export default {
     locales: {
       type: Object,
       required: true
+    }
+  },
+  computed: {
+    getStatusMachine() {
+      if (this.machine.status === 'Рабочая') return 'green'
+      else return 'red'
     }
   }
 }

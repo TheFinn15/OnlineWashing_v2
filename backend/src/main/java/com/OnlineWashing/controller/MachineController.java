@@ -3,6 +3,7 @@ package com.OnlineWashing.controller;
 import com.OnlineWashing.exception.machine.MachineNotFoundException;
 import com.OnlineWashing.model.Draft;
 import com.OnlineWashing.model.Machine;
+import com.OnlineWashing.model.Stock;
 import com.OnlineWashing.repo.MachineRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -51,7 +53,7 @@ public class MachineController {
         try {
             LocalDateTime dateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH:mm:ss");
-            if (machine.getStatus() == null) machine.setStatus("green");
+            if (machine.getStock() == null) machine.setStock(null);
             machine.setLastUpdateRow(dateTime.format(formatter));
             return machineRepo.save(machine);
         } catch (Exception ex) {

@@ -70,7 +70,6 @@ export default {
   props: ['machine', 'modeEdit', 'modeDel', 'updater'],
   methods: {
     showEditForm() {
-      console.log('here')
       this.updater(
           {infoItem:this.machine, showEdit: true, showDel: false}
       )
