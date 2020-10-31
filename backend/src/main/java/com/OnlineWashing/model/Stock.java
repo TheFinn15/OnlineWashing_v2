@@ -11,7 +11,7 @@ public class Stock {
     private Long id;
     private String name;
     private String sponsor;
-    private Date lastTerm;
+    private String lastTerm;
     private int discount;
     private String lastUpdateRow;
 
@@ -39,11 +39,11 @@ public class Stock {
         this.sponsor = sponsor;
     }
 
-    public Date getLastTerm() {
+    public String getLastTerm() {
         return lastTerm;
     }
 
-    public void setLastTerm(Date lastTerm) {
+    public void setLastTerm(String lastTerm) {
         this.lastTerm = lastTerm;
     }
 

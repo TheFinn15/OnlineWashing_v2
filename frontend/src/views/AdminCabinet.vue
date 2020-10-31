@@ -111,6 +111,17 @@
                   v-if="chosenTable === 'Stocks'"
                   style="overflow-y: scroll; height: 100%"
               />
+              <DraftList
+                  :updater="updater"
+                  :show-edit="showEditForm"
+                  :show-del="showDelForm"
+                  :item-info="forms.drafts"
+                  :table-info="chosenTableInfo"
+                  :mode-del="modeDel"
+                  :mode-edit="modeEdit"
+                  v-if="chosenTable === 'Drafts'"
+                  style="overflow-y: scroll; height: 100%"
+              />
             </v-card>
           </v-dialog>
           <v-dialog max-width="1000" persistent v-model="showAddForm">
@@ -298,6 +309,92 @@
                       </v-col>
                     </v-row>
                   </v-container>
+                  <v-container v-if="chosenTable === 'Drafts'">
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            type="number"
+                            label="Объем вещей в кг"
+                            outlined
+                            :rules="rulesNum"
+                            required
+                            v-model="forms.drafts.volume"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-text-field
+                            type="number"
+                            label="Цена"
+                            outlined
+                            :rules="rulesNum"
+                            required
+                            v-model="forms.drafts.price"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-select
+                            label="Вид оплаты:"
+                            outlined
+                            :items="['Наличкой', 'Картой']"
+                            required
+                            v-model="forms.drafts.paymentType"
+                        ></v-select>
+                      </v-col>
+                      <v-col v-if="forms.drafts.paymentType === 'Картой'">
+                        <v-text-field
+                            type="number"
+                            label="Номер кредитной карты:"
+                            outlined
+                            :rules="rulesNum"
+                            required
+                            v-model="forms.drafts.creditCard"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-select
+                            label="Пользователь:"
+                            outlined
+                            :items="renderUserForChoose"
+                            required
+                            v-model="forms.drafts.person"
+                        ></v-select>
+                      </v-col>
+                      <v-col>
+                        <v-select
+                            label="Стиральная машина:"
+                            outlined
+                            :items="renderMachineForChoose"
+                            required
+                            v-model="forms.drafts.machine"
+                        ></v-select>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-select
+                            label="Хим. добавки:"
+                            outlined
+                            :items="['Кондиционер `Lenor`']"
+                            required
+                            chips
+                            multiple
+                            v-model="forms.drafts.additional"
+                        ></v-select>
+                      </v-col>
+                      <v-col>
+                        <v-text-field
+                            label="Дата оплаты:"
+                            outlined
+                            readonly
+                            v-model="forms.drafts.date"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-tab-item>
                 <v-tab-item>
                   <v-container v-if="chosenTable === 'Persons'">
@@ -321,6 +418,20 @@
                     </v-row>
                   </v-container>
                   <v-container v-if="chosenTable === 'Stocks'" style="padding: 4%; overflow: hidden">
+                    <v-row>
+                      <v-col>
+                        <div>
+                          <v-icon large style="text-align: center; display: block">
+                            warning
+                          </v-icon>
+                          <v-card-title style="text-align: center; display: block">
+                            Отсутствуют
+                          </v-card-title>
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'Drafts'" style="padding: 4%; overflow: hidden">
                     <v-row>
                       <v-col>
                         <div>
@@ -544,6 +655,20 @@
                       </v-col>
                     </v-row>
                   </v-container>
+                  <v-container v-if="chosenTable === 'Drafts'">
+                    <v-row>
+                      <v-col>
+                        <div>
+                          <v-icon large style="text-align: center; display: block">
+                            error
+                          </v-icon>
+                          <v-card-title style="text-align: center; display: block">
+                            Редактирование невозможно
+                          </v-card-title>
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-tab-item>
                 <v-tab-item>
                   <v-container v-if="chosenTable === 'Persons'">
@@ -567,6 +692,20 @@
                     </v-row>
                   </v-container>
                   <v-container v-if="chosenTable === 'Stocks'">
+                    <v-row>
+                      <v-col>
+                        <div>
+                          <v-icon large style="text-align: center; display: block">
+                            warning
+                          </v-icon>
+                          <v-card-title style="text-align: center; display: block">
+                            Отсутствуют
+                          </v-card-title>
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'Drafts'" style="padding: 4%; overflow: hidden">
                     <v-row>
                       <v-col>
                         <div>
@@ -610,13 +749,14 @@
 import PersonsList from "@/components/tables/PersonsList";
 import MachineList from "@/components/tables/MachineList";
 import StockList from "@/components/tables/StockList";
+import DraftList from "@/components/tables/DraftList";
 const ip = "192.168.0.153"
 const port = '9000'
 const axios = require('axios')
 
 export default {
   name: "AdminCabinet",
-  components: {StockList, MachineList, PersonsList},
+  components: {DraftList, StockList, MachineList, PersonsList},
   data() {
     return {
       chosenDate: new Date().toISOString().substr(0, 10),
@@ -707,8 +847,9 @@ export default {
           machine: '',
           price: '',
           volume: '',
-          additional: '',
+          additional: [],
           paymentType: '',
+          date: new Date().toISOString().substr(0, 10),
           creditCard: ''
         },
         wallets: {
@@ -727,12 +868,19 @@ export default {
       }
     }
   },
+  computed: {
+    renderMachineForChoose() {
+      return this.editForm.machines.map(i => 'ID: ' + i.id + ' | ' + i.name + ' | ' + i.capacity)
+    },
+    renderUserForChoose() {
+      return this.editForm.persons.map(i => 'ID: ' + i.id + ' | ' + i.fName + ' ' + i.sName)
+    }
+  },
   methods: {
     reFormateDate() {
       const [year, month, day] = this.chosenDate.split('-')
       this.forms.stocks.lastTerm = `${month}/${day}/${year}`;
       this.menuChooseDate = false;
-
     },
     doCloseTable() {
       this.fullInfo = false
@@ -752,7 +900,7 @@ export default {
       else if (this.chosenTable === 'Machines') {
         axios({
           method: 'GET',
-          url: `http://${ip}:${port}/api/persons`
+          url: `http://${ip}:${port}/api/machines`
         }).then(resp => {
           this.chosenTableInfo = resp.data.filter(i => regex.test(i.name))
         })
@@ -760,7 +908,7 @@ export default {
       else if (this.chosenTable === 'Drafts') {
         axios({
           method: 'GET',
-          url: `http://${ip}:${port}/api/persons`
+          url: `http://${ip}:${port}/api/drafts`
         }).then(resp => {
           this.chosenTableInfo = resp.data.filter(i => regex.test(i.paymentType))
         })
@@ -768,12 +916,12 @@ export default {
       else if (this.chosenTable === 'Wallets') {
         axios({
           method: 'GET',
-          url: `http://${ip}:${port}/api/persons`
+          url: `http://${ip}:${port}/api/wallets`
         }).then(resp => {
           this.chosenTableInfo = resp.data.filter(i => regex.test(i.balance))
         })
       }
-      else if (this.chosenTable === 'Histories') {
+      else if (this.chosenTable === 'histories') {
         axios({
           method: 'GET',
           url: `http://${ip}:${port}/api/persons`
@@ -784,7 +932,7 @@ export default {
       else if (this.chosenTable === 'Stocks') {
         axios({
           method: 'GET',
-          url: `http://${ip}:${port}/api/persons`
+          url: `http://${ip}:${port}/api/stocks`
         }).then(resp => {
           this.chosenTableInfo = resp.data.filter(i => regex.test(i.name || i.sponsor || i.discount))
         })
@@ -820,6 +968,10 @@ export default {
       try {
         let table = this.chosenTable
         let curForms = this.forms[table.toLowerCase()]
+        if (table === 'Drafts') {
+          curForms.machine = {id: curForms.machine.split('|')[0].split(': ')[1]}
+          curForms.person = {id: curForms.person.split('|')[0].split(': ')[1]}
+        }
         if (table === 'Persons' && curForms.machine === '') curForms.machine = null
         if (table === 'Machines' && curForms.stock === '') curForms.stock = null
         console.log('info', curForms)
@@ -829,12 +981,12 @@ export default {
           data: this.forms[table.toLowerCase()]
         }).then(resp => {
           console.log(resp)
-          this.chosenTableInfo.push(resp.data)
 
           this.$nextTick(() => {
             this.showAddForm = false;
             this.alertSuccess = true;
             this.alertText = 'Успешно добавлена запись';
+            this.chosenTableInfo.push(resp.data)
           })
 
           for (let item of Object.keys(this.forms[table.toLowerCase()])) {
