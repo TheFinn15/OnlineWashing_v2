@@ -31,7 +31,7 @@ public class DraftController {
         this.draftRepo = draftRepo;
     }
 
-    @GetMapping("reports/drafts/monthly-checks")
+    @GetMapping("reports/monthly-checks")
     public ArrayList<Draft> getReportDraftsMonth(){
         LocalDateTime dateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH:mm:ss");

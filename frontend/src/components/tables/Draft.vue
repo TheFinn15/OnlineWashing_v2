@@ -72,7 +72,7 @@
         </v-list-group>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Уплаченная цена: {{draft.price}}</v-list-item-title>
+        <v-list-item-title>Уплаченная цена: {{draft.price}} UAH</v-list-item-title>
       </v-list-item>
       <v-list-item>
         <v-list-item-title>Объем вещей: {{draft.volume}} кг</v-list-item-title>
