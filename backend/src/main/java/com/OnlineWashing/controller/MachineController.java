@@ -32,7 +32,7 @@ public class MachineController {
         ArrayList<Machine> drafts = new ArrayList<>();
         for(int i=0;i<machineRepo.findAll().size();i++) {
             Machine machine = machineRepo.findAll().get(i);
-            if (machine.getStatus().equals("red")) {
+            if (machine.getStatus().equals("Не рабочая")) {
                 drafts.add(machine);
             }
         }
