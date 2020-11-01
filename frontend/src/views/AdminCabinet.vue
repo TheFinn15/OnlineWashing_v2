@@ -122,6 +122,28 @@
                   v-if="chosenTable === 'Drafts'"
                   style="overflow-y: scroll; height: 100%"
               />
+              <WalletList
+                  :updater="updater"
+                  :show-edit="showEditForm"
+                  :show-del="showDelForm"
+                  :item-info="forms.wallets"
+                  :table-info="chosenTableInfo"
+                  :mode-del="modeDel"
+                  :mode-edit="modeEdit"
+                  v-if="chosenTable === 'Wallets'"
+                  style="overflow-y: scroll; height: 100%"
+              />
+              <HistoryList
+                  :updater="updater"
+                  :show-edit="showEditForm"
+                  :show-del="showDelForm"
+                  :item-info="forms.histories"
+                  :table-info="chosenTableInfo"
+                  :mode-del="modeDel"
+                  :mode-edit="modeEdit"
+                  v-if="chosenTable === 'HistoryTransactions'"
+                  style="overflow-y: scroll; height: 100%"
+              />
             </v-card>
           </v-dialog>
           <v-dialog max-width="1000" persistent v-model="showAddForm">
@@ -395,6 +417,67 @@
                       </v-col>
                     </v-row>
                   </v-container>
+                  <v-container v-if="chosenTable === 'Wallets'">
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            type="number"
+                            label="Цена"
+                            outlined
+                            :rules="rulesNum"
+                            required
+                            v-model="forms.wallets.balance"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-select
+                            label="История транзакций недоступна"
+                            readonly
+                            outlined
+                        ></v-select>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'HistoryTransactions'">
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            type="number"
+                            label="Сумма пополнения"
+                            outlined
+                            :rules="rulesNum"
+                            required
+                            v-model="forms.histories.sum"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-menu
+                            v-model="menuChooseDate"
+                            :close-on-content-click="false"
+                            offset-y
+                            transition='scale-transition'
+                            max-width="100%"
+                        >
+                          <template v-slot:activator="{on, attrs}">
+                            <v-text-field
+                                v-model="forms.histories.date"
+                                label="Дата пополнения"
+                                persistent-hint
+                                prepend-icon="mdi-calendar"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker
+                              v-model="chosenDate"
+                              no-title
+                              @input="reFormateDate"
+                          ></v-date-picker>
+                        </v-menu>
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-tab-item>
                 <v-tab-item>
                   <v-container v-if="chosenTable === 'Persons'">
@@ -432,6 +515,34 @@
                     </v-row>
                   </v-container>
                   <v-container v-if="chosenTable === 'Drafts'" style="padding: 4%; overflow: hidden">
+                    <v-row>
+                      <v-col>
+                        <div>
+                          <v-icon large style="text-align: center; display: block">
+                            warning
+                          </v-icon>
+                          <v-card-title style="text-align: center; display: block">
+                            Отсутствуют
+                          </v-card-title>
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'Wallets'" style="padding: 4%; overflow: hidden">
+                    <v-row>
+                      <v-col>
+                        <div>
+                          <v-icon large style="text-align: center; display: block">
+                            warning
+                          </v-icon>
+                          <v-card-title style="text-align: center; display: block">
+                            Отсутствуют
+                          </v-card-title>
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'HistoryTransactions'" style="padding: 4%; overflow: hidden">
                     <v-row>
                       <v-col>
                         <div>
@@ -669,6 +780,70 @@
                       </v-col>
                     </v-row>
                   </v-container>
+                  <v-container v-if="chosenTable === 'Wallets'">
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            type="number"
+                            label="Цена"
+                            outlined
+                            :rules="rulesNum"
+                            :placeholder="editForm.wallets.balance"
+                            required
+                            v-model="forms.wallets.balance"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-select
+                            label="Историю транзакций недоступна"
+                            readonly
+                            outlined
+                        ></v-select>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'HistoryTransactions'">
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                            type="number"
+                            label="Сумма пополнения"
+                            outlined
+                            :rules="rulesNum"
+                            :placeholder="editForm.histories.sum"
+                            required
+                            v-model="forms.histories.sum"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col>
+                        <v-menu
+                            v-model="menuChooseDate"
+                            :close-on-content-click="false"
+                            offset-y
+                            transition='scale-transition'
+                            max-width="100%"
+                        >
+                          <template v-slot:activator="{on, attrs}">
+                            <v-text-field
+                                v-model="forms.histories.date"
+                                :placeholder="editForm.histories.date"
+                                label="Дата пополнения"
+                                persistent-hint
+                                prepend-icon="mdi-calendar"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker
+                              v-model="chosenDate"
+                              no-title
+                              @input="reFormateDate"
+                          ></v-date-picker>
+                        </v-menu>
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-tab-item>
                 <v-tab-item>
                   <v-container v-if="chosenTable === 'Persons'">
@@ -691,7 +866,7 @@
                       <v-checkbox v-else readonly label="Акции отсутствуют"></v-checkbox>
                     </v-row>
                   </v-container>
-                  <v-container v-if="chosenTable === 'Stocks'">
+                  <v-container v-if="chosenTable === 'Stocks'" style="padding: 4%; overflow: hidden">
                     <v-row>
                       <v-col>
                         <div>
@@ -706,6 +881,34 @@
                     </v-row>
                   </v-container>
                   <v-container v-if="chosenTable === 'Drafts'" style="padding: 4%; overflow: hidden">
+                    <v-row>
+                      <v-col>
+                        <div>
+                          <v-icon large style="text-align: center; display: block">
+                            warning
+                          </v-icon>
+                          <v-card-title style="text-align: center; display: block">
+                            Отсутствуют
+                          </v-card-title>
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'Wallets'" style="padding: 4%; overflow: hidden">
+                    <v-row>
+                      <v-col>
+                        <div>
+                          <v-icon large style="text-align: center; display: block">
+                            warning
+                          </v-icon>
+                          <v-card-title style="text-align: center; display: block">
+                            Отсутствуют
+                          </v-card-title>
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-container v-if="chosenTable === 'HistoryTransactions'" style="padding: 4%; overflow: hidden">
                     <v-row>
                       <v-col>
                         <div>
@@ -750,13 +953,15 @@ import PersonsList from "@/components/tables/PersonsList";
 import MachineList from "@/components/tables/MachineList";
 import StockList from "@/components/tables/StockList";
 import DraftList from "@/components/tables/DraftList";
+import WalletList from "@/components/tables/WalletList";
+import HistoryList from "@/components/tables/HistoryList";
 const ip = "192.168.0.153"
 const port = '9000'
 const axios = require('axios')
 
 export default {
   name: "AdminCabinet",
-  components: {DraftList, StockList, MachineList, PersonsList},
+  components: {HistoryList, WalletList, DraftList, StockList, MachineList, PersonsList},
   data() {
     return {
       chosenDate: new Date().toISOString().substr(0, 10),
@@ -879,7 +1084,8 @@ export default {
   methods: {
     reFormateDate() {
       const [year, month, day] = this.chosenDate.split('-')
-      this.forms.stocks.lastTerm = `${month}/${day}/${year}`;
+      if (this.chosenTable === 'Stocks') this.forms.stocks.lastTerm = `${month}/${day}/${year}`;
+      if (this.chosenTable === 'HistoryTransactions') this.forms.histories.date = `${month}/${day}/${year}`
       this.menuChooseDate = false;
     },
     doCloseTable() {
@@ -894,7 +1100,7 @@ export default {
           method: 'GET',
           url: `http://${ip}:${port}/api/persons`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.fName + ' ' + i.sName || i.fName || i.sName))
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.id || i.fName + ' ' + i.sName || i.fName || i.sName))
         })
       }
       else if (this.chosenTable === 'Machines') {
@@ -902,7 +1108,7 @@ export default {
           method: 'GET',
           url: `http://${ip}:${port}/api/machines`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.name))
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.id || i.name))
         })
       }
       else if (this.chosenTable === 'Drafts') {
@@ -910,7 +1116,7 @@ export default {
           method: 'GET',
           url: `http://${ip}:${port}/api/drafts`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.paymentType))
+          this.chosenTableInfo = resp.data.filter(i => regex.testi.id || (i.paymentType))
         })
       }
       else if (this.chosenTable === 'Wallets') {
@@ -918,7 +1124,7 @@ export default {
           method: 'GET',
           url: `http://${ip}:${port}/api/wallets`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.balance))
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.id || i.balance))
         })
       }
       else if (this.chosenTable === 'histories') {
@@ -926,7 +1132,7 @@ export default {
           method: 'GET',
           url: `http://${ip}:${port}/api/persons`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.sum || i.date))
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.id || i.sum || i.date))
         })
       }
       else if (this.chosenTable === 'Stocks') {
@@ -934,7 +1140,7 @@ export default {
           method: 'GET',
           url: `http://${ip}:${port}/api/stocks`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.name || i.sponsor || i.discount))
+          this.chosenTableInfo = resp.data.filter(i => regex.test(i.id || i.name || i.sponsor || i.discount))
         })
       }
       else {
