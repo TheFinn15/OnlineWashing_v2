@@ -20,7 +20,7 @@
 <script>
 import MachineList from "@/components/MachineList";
 const axios = require('axios')
-const ip = "192.168.0.112"
+const ip = "192.168.0.153"
 const port = "9000"
 
 export default {
@@ -31,7 +31,7 @@ export default {
   data() {
     return {
       info: {
-        machines: null
+        machines: []
       },
       curLocale: null,
       locales: {
@@ -100,8 +100,13 @@ export default {
     }
   },
   mounted() {
-    axios.get(`http://${ip}:${port}/api/machines`)
-      .then(resp => (this.info.machines = resp.data))
+    axios({
+      method: 'GET',
+      url: `http://${ip}:${port}/api/machines`
+    })
+      .then(resp => {
+        this.info.machines = resp.data
+      })
   }
 }
 </script>

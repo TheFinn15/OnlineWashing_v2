@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app color="indigo">
-      <v-toolbar-title style="color: white">{{curLocale.toolbarTitle}}</v-toolbar-title>
+      <v-toolbar-title @click="homePage" style="color: white">{{curLocale.toolbarTitle}}</v-toolbar-title>
       <v-menu v-model="translate" offset-x rounded="b-xl" :close-on-content-click="false" nudge-width="140">
         <template v-slot:activator="{on, attrs}">
           <v-btn v-on="on" v-bind="attrs" color="white" icon :title="curLocale.locales.tip">
@@ -152,34 +152,42 @@
         <v-form>
           <v-container>
             <v-row>
-              <v-col>
+              <v-col cols="12">
                 <v-text-field
                     :label="curLocale.authForm.labels[0]"
                     v-model="login"
                     :rules="textRules"
+                    prepend-icon="person"
                     required
                 ></v-text-field>
               </v-col>
-            </v-row>
-            <v-row>
               <v-col>
                 <v-text-field
                     type="password"
                     :label="curLocale.authForm.labels[1]"
                     v-model="pwd"
                     :rules="textRules"
+                    prepend-icon="lock"
                     required
                 ></v-text-field>
               </v-col>
             </v-row>
+            <v-btn @click="doAuth" color="success" block>{{curLocale.authForm.btnTitle}}</v-btn>
           </v-container>
-          <v-btn @click="doAuth" color="success" width="100%">{{curLocale.authForm.btnTitle}}</v-btn>
         </v-form>
       </v-card>
     </v-dialog>
     <v-dialog v-model="register" max-width="600px" persistent>
       <v-card>
-        <v-card-title>Регистрация</v-card-title>
+        <v-card-title>
+          Регистрация
+          <v-spacer></v-spacer>
+          <v-btn icon @click="authForm = false">
+            <v-icon>
+              close
+            </v-icon>
+          </v-btn>
+        </v-card-title>
         <v-divider></v-divider>
         <v-alert
             v-model="errForm"
@@ -222,6 +230,7 @@
                   outlined
                   label="Логин:"
                   v-model="form.login"
+                  prepend-inner-icon="person"
                   :rules="textRules"
                   required
               ></v-text-field>
@@ -230,6 +239,7 @@
                   outlined
                   label="Пароль:"
                   v-model="form.pwd"
+                  prepend-inner-icon="lock"
                   :rules="textRules"
                   required
               ></v-text-field>
@@ -241,6 +251,7 @@
                   outlined
                   label="Телефон:"
                   v-model="form.phone"
+                  prepend-inner-icon="phone"
                   :rules="phoneRules"
                   required
               ></v-text-field>
@@ -248,6 +259,7 @@
                   outlined
                   label="E-mail:"
                   v-model="form.email"
+                  prepend-inner-icon="email"
                   :rules="emailRules"
                   required
               ></v-text-field>
@@ -266,11 +278,11 @@
               </v-row>
             </v-col>
           </v-row>
+          <v-btn @click="doRegister" color="indigo" outlined block class="pa-2">СОЗДАТЬ АККАУНТ</v-btn>
         </v-container>
-        <v-btn @click="doRegister" color="indigo" outlined block class="pa-2">СОЗДАТЬ АККАУНТ</v-btn>
       </v-card>
     </v-dialog>
-    <router-view></router-view>
+    <router-view :locales="curLocale"></router-view>
   </v-app>
 </template>
 
@@ -338,6 +350,8 @@
               rulesText: [
                 'This field can not be a empty'
               ],
+              phoneRules: 'Input correct phone number',
+              emailRules: 'Input correct e-mail',
               btnTitle: 'ENTER'
             }
           },
@@ -347,12 +361,12 @@
             locales: {
               langSubTitle: 'Язык интерфейса',
               selects: [
-                  'English', 'Русский', 'Украинский'
+                'English', 'Русский', 'Украинский'
               ]
             },
             authedUser: {
               menuItems: [
-                  'ГРН', 'Личный кабинет', 'Каталог', 'Выйти'
+                'ГРН', 'Личный кабинет', 'Каталог', 'Выйти'
               ]
             },
             nonAuthedUser: {
@@ -363,11 +377,13 @@
             authForm: {
               title: 'Авторизация',
               labels: [
-                  'Логин*', 'Пароль*'
+                'Логин*', 'Пароль*'
               ],
               rulesText: [
-                  'Это поле не может быть пустым'
+                'Это поле не может быть пустым'
               ],
+              phoneRules: 'Введите верный телефон',
+              emailRules: 'Введите верный e-mail',
               btnTitle: 'ВОЙТИ'
             }
           },
@@ -398,6 +414,8 @@
               rulesText: [
                 'Поле не може бути порожнім'
               ],
+              phoneRules: 'Напишіть коректний телефон',
+              emailRules: 'Напишіть коректний e-mail',
               btnTitle: 'ВІЙТИ'
             }
           }
@@ -416,15 +434,15 @@
           v => v.length !== 0 || this.curLocale.authForm.rulesText[0]
         ],
         phoneRules: [
-            v => v.match('[0-9]{10}') !== null || 'Введите верный телефон'
+            v => v.match('[0-9]{10}') !== null || this.curLocale.authForm.phoneRules
         ],
         emailRules: [
-            v => v.match('[a-zA-Z]+@[a-zA-Z]+.[a-zA-Z]+') !== null || 'Введите верный e-mail'
+            v => v.match('[a-zA-Z]+@[a-zA-Z]+.[a-zA-Z]+') !== null || this.curLocale.authForm.emailRules
         ]
       }
     },
     mounted() {
-      if (localStorage.getItem('uid') !== undefined) {
+      if (localStorage.getItem('uid') !== null) {
         axios.get(`http://${ip}:${port}/api/persons`)
           .then(resp => {
             let uId = resp.data.filter(i => i.sessionId === localStorage.getItem('uid'))
@@ -465,6 +483,9 @@
       }
     },
     methods: {
+      homePage() {
+        if (this.$route.path !== '/') this.$router.push('/')
+      },
       doLoadAvatar(ev) {
         let reader = new FileReader();
         reader.onload = (e) => {
@@ -476,10 +497,13 @@
       doLogout() {
         axios.get(`http://${ip}:${port}/api/persons`)
             .then(resp => {
-              let uId = resp.data.filter(i => i.sessionId === localStorage.getItem('uid'))
-              uId = uId[uId.length-1].id
-              axios.put(`http://${ip}:${port}/api/persons/`+uId, {
-                sessionId: ''
+              let uId = resp.data.filter(i => i.sessionId === localStorage.getItem('uid')).map(i => i.id)[0]
+              axios({
+                method: 'PUT',
+                url: `http://${ip}:${port}/api/persons/`+uId,
+                data: {
+                  sessionId: ''
+                }
               })
                   .then(resp1 => {
                     console.log(resp1)
@@ -487,23 +511,23 @@
                   })
                   .catch(err => console.log('catch error', err))
             })
-        this.$forceUpdate()
-        window.history.go();
+        this.isAuth = false;
+        // window.history.go();
       },
       changeLangEN() {
         localStorage.setItem('lang', 'en-EN')
         this.curLocale = this.locales["en-EN"];
-        this.$router.go('/cabinet');
+        // this.$router.go(this.$router.currentRoute.path);
       },
       changeLangRU() {
         localStorage.setItem('lang', 'ru-RU')
         this.curLocale = this.locales["ru-RU"];
-        this.$router.go('/cabinet');
+        // this.$router.go(this.$router.currentRoute.path);
       },
       changeLangUA() {
         localStorage.setItem('lang', 'ua-UA')
         this.curLocale = this.locales["ua-UA"];
-        this.$router.go('/cabinet');
+        // this.$router.go(this.$router.currentRoute.path);
       },
       doAuth() {
         let req = new XMLHttpRequest()
@@ -543,7 +567,7 @@
             this.authForm = false
             this.info.userInfo = info
             window.location.reload()
-          }, 1500)
+          }, 1200)
         } else {
           this.errForm = true
           this.errText = 'Введены неверные данные'

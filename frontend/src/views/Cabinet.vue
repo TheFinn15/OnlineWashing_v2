@@ -6,21 +6,51 @@
         <v-tab>{{curLocale.tabsNames[1]}}</v-tab>
         <v-tab>{{curLocale.tabsNames[2]}}</v-tab>
         <v-tab-item>
-          <v-card-title>{{curLocale.tabItems[0].title}} {{info.userInfo.fName}} {{info.userInfo.sName}}</v-card-title>
+          <v-card-title style="justify-content: center; display: flex">{{curLocale.tabItems[0].title}}</v-card-title>
           <v-divider></v-divider>
           <v-container>
             <v-row>
               <v-col>
-                <v-img width="240" height="240" :src="info.userInfo.avatar"></v-img>
+                <v-text-field
+                    :label="curLocale.tabItems[0].userInfo[0]"
+                    :value="info.userInfo.fName"
+                    filled
+                    rounded
+                ></v-text-field>
               </v-col>
               <v-col>
-                <v-card-text>
-                  <b>{{curLocale.tabItems[0].userInfo[0]}}</b> {{info.userInfo.fName}} <br/>
-                  <b>{{curLocale.tabItems[0].userInfo[1]}}</b> {{info.userInfo.sName}} <br/>
-                  <b>{{curLocale.tabItems[0].userInfo[2]}}</b> {{info.userInfo.login}} <br/>
-                  <b>{{curLocale.tabItems[0].userInfo[3]}}</b> {{info.userInfo.email}} <br/>
-                  <b>{{curLocale.tabItems[0].userInfo[4]}}</b> {{info.userInfo.phone}} <br/>
-                </v-card-text>
+                <v-text-field
+                    :label="curLocale.tabItems[0].userInfo[1]"
+                    :value="info.userInfo.sName"
+                    filled
+                    rounded
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                    :label="curLocale.tabItems[0].userInfo[2]"
+                    :value="info.userInfo.login"
+                    filled
+                    rounded
+                ></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                    :label="curLocale.tabItems[0].userInfo[3]"
+                    :value="info.userInfo.email"
+                    filled
+                    rounded
+                ></v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field
+                    :label="curLocale.tabItems[0].userInfo[4]"
+                    :value="info.userInfo.phone"
+                    filled
+                    rounded
+                ></v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -140,68 +170,74 @@
         <v-tab-item>
           <v-card-title>{{ curLocale.tabItems[2].title }}</v-card-title>
           <v-divider></v-divider>
-          <v-container>
-            <v-row style="margin: 0 2% 0 2%">
-              <v-col>
-                <v-img :src="info.userInfo.avatar" width="420" height="420"></v-img>
-                <v-file-input
-                    accept="image/png, image/jpeg, image/jpg"
-                    :label="curLocale.tabItems[2].editForm.avatar"
-                    prepend-icon="mdi-camera"
-                ></v-file-input>
-              </v-col>
-              <v-col>
-                <v-row>
-                  <v-col>
-                    <v-text-field
-                        :label="curLocale.tabItems[2].editForm.fName"
-                        :placeholder="info.userInfo.fName"
-                        outlined
-                    ></v-text-field>
-                    <v-text-field
-                        :label="curLocale.tabItems[2].editForm.sName"
-                        :placeholder="info.userInfo.sName"
-                        outlined
-                    ></v-text-field>
-                    <v-text-field
-                        :label="curLocale.tabItems[2].editForm.phone"
-                        :rules="phoneRules"
-                        :placeholder="info.userInfo.phone"
-                        outlined
-                    ></v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-text-field
-                        :label="curLocale.tabItems[2].editForm.login"
-                        :placeholder="info.userInfo.login"
-                        outlined
-                    ></v-text-field>
-                    <v-text-field
-                        :label="curLocale.tabItems[2].editForm.pwd"
-                        type="password"
-                        :placeholder="info.userInfo.pwd"
-                        outlined
-                    ></v-text-field>
-                    <v-text-field
-                        :label="curLocale.tabItems[2].editForm.email"
-                        type="email"
-                        :rules="emailRules"
-                        :placeholder="info.userInfo.email"
-                        outlined
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-          </v-container>
-          <v-btn @click="editSettings" outlined color="indigo" width="100%">{{curLocale.tabItems[2].editForm.btnTitle}}</v-btn>
+          <form>
+            <v-container>
+              <v-row style="margin: 0 2% 0 2%">
+                <v-col>
+                  <v-img :src="info.userInfo.avatar" width="420" height="420"></v-img>
+                  <v-file-input
+                      accept="image/png, image/jpeg, image/jpg"
+                      :label="curLocale.tabItems[2].editForm.avatar"
+                      prepend-icon="mdi-camera"
+                  ></v-file-input>
+                </v-col>
+                <v-col>
+                  <v-row>
+                    <v-col>
+                      <v-text-field
+                          :label="curLocale.tabItems[2].editForm.fName"
+                          :placeholder="info.userInfo.fName"
+                          outlined
+                      ></v-text-field>
+                      <v-text-field
+                          :label="curLocale.tabItems[2].editForm.sName"
+                          :placeholder="info.userInfo.sName"
+                          outlined
+                      ></v-text-field>
+                      <v-text-field
+                          :label="curLocale.tabItems[2].editForm.phone"
+                          :rules="phoneRules"
+                          :placeholder="info.userInfo.phone"
+                          outlined
+                      ></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                          :label="curLocale.tabItems[2].editForm.login"
+                          :placeholder="info.userInfo.login"
+                          outlined
+                      ></v-text-field>
+                      <v-text-field
+                          :label="curLocale.tabItems[2].editForm.pwd"
+                          type="password"
+                          :placeholder="info.userInfo.pwd"
+                          outlined
+                      ></v-text-field>
+                      <v-text-field
+                          :label="curLocale.tabItems[2].editForm.email"
+                          type="email"
+                          :rules="emailRules"
+                          :placeholder="info.userInfo.email"
+                          outlined
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col>
+                      <v-btn @click="editSettings" outlined color="indigo" block>{{curLocale.tabItems[2].editForm.btnTitle}}</v-btn>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-container>
+          </form>
         </v-tab-item>
       </v-tabs>
     </v-card>
     <v-card v-else style="margin: 8% 15% 0 15%; padding: 5%">
       <v-icon style="justify-content: center; display: flex">warning</v-icon>
       <v-card-title style="text-align: center; display: block">
-        Отказано в доступе
+        {{ curLocale.notFound }}
       </v-card-title>
     </v-card>
   </v-app>
@@ -216,8 +252,15 @@ export default {
   data() {
     return {
       info: {
-        userInfo: null,
-        drafts: null
+        userInfo: {
+          fName: '',
+          sName: '',
+          login: '',
+          email: '',
+          phone: '',
+          machine: []
+        },
+        drafts: []
       },
       phoneRules: [
         v => v.length === 10 || this.curLocale.tabItems[2].editForm.rulePhoneText
@@ -282,7 +325,8 @@ export default {
                 ruleEmailText: 'Input correct e-mail'
               }
             }
-          ]
+          ],
+          notFound: 'Denied to access'
         },
         'ru-RU': {
           tabsNames: [
@@ -339,7 +383,8 @@ export default {
                 ruleEmailText: 'Введите верный e-mail'
               }
             }
-          ]
+          ],
+          notFound: 'Отказано в доступе'
         },
         'ua-UA': {
           tabsNames: [
@@ -396,7 +441,8 @@ export default {
                 ruleEmailText: 'Введіть коректний e-mail'
               }
             }
-          ]
+          ],
+          notFound: 'Відмовленно у доступі'
         }
       },
       authSuccess: false
@@ -410,7 +456,6 @@ export default {
   beforeMount() {
     if (localStorage['lang'] === 'ru-RU') {
       this.curLocale = this.locales["ru-RU"];
-      console.log(this.curLocale);
     } else if (localStorage['lang'] === 'en-EN') {
       this.curLocale = this.locales["en-EN"];
     } else if (localStorage['lang'] === 'ua-UA') {
@@ -423,16 +468,20 @@ export default {
   mounted() {
     axios.get(`http://${ip}:${port}/api/persons/`)
       .then(resp => {
-        console.log(localStorage.getItem('uid'))
-        let info = resp.data.filter(i => i.sessionId === localStorage.getItem('uid'))
-        console.log('sa', info)
-        if (info.length > 0) {
-          this.info.userInfo = info[0]
-          axios.get(`http://${ip}:${port}/api/drafts`)
-            .then(resp1 => {
-              this.info.drafts = resp1.data.filter(i => i.person.id === this.info.userInfo.id);
-          })
-          this.authSuccess = true
+        console.info('session', localStorage.getItem('uid'))
+        if (localStorage.getItem('uid') !== null ) {
+          let info = resp.data.filter(i => i.sessionId === localStorage.getItem('uid'))
+          console.info('data', info)
+          if (info.length > 0) {
+            this.info.userInfo = info[0]
+            axios.get(`http://${ip}:${port}/api/drafts`)
+                .then(resp1 => {
+                  this.info.drafts = resp1.data.filter(i => i.person.id === this.info.userInfo.id);
+                })
+            this.authSuccess = true
+          } else {
+            this.authSuccess = false
+          }
         } else {
           this.authSuccess = false
         }
