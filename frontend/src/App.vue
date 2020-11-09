@@ -182,7 +182,7 @@
         <v-card-title>
           Регистрация
           <v-spacer></v-spacer>
-          <v-btn icon @click="authForm = false">
+          <v-btn icon @click="register = false">
             <v-icon>
               close
             </v-icon>
@@ -282,7 +282,7 @@
         </v-container>
       </v-card>
     </v-dialog>
-    <router-view :locales="curLocale"></router-view>
+    <router-view></router-view>
   </v-app>
 </template>
 
@@ -517,17 +517,17 @@
       changeLangEN() {
         localStorage.setItem('lang', 'en-EN')
         this.curLocale = this.locales["en-EN"];
-        // this.$router.go(this.$router.currentRoute.path);
+        this.$router.go(this.$router.currentRoute.path);
       },
       changeLangRU() {
         localStorage.setItem('lang', 'ru-RU')
         this.curLocale = this.locales["ru-RU"];
-        // this.$router.go(this.$router.currentRoute.path);
+        this.$router.go(this.$router.currentRoute.path);
       },
       changeLangUA() {
         localStorage.setItem('lang', 'ua-UA')
         this.curLocale = this.locales["ua-UA"];
-        // this.$router.go(this.$router.currentRoute.path);
+        this.$router.go(this.$router.currentRoute.path);
       },
       doAuth() {
         let req = new XMLHttpRequest()

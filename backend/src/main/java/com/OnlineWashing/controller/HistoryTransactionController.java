@@ -52,6 +52,12 @@ public class HistoryTransactionController {
                 .map(historyTransaction -> {
                     if (newHistoryTransaction.getDate() != null) { historyTransaction.setDate(newHistoryTransaction.getDate()); }
                     if (newHistoryTransaction.getSum() != null) { historyTransaction.setSum(newHistoryTransaction.getSum()); }
+                    if (newHistoryTransaction.getPaymentType() != null) {
+                        historyTransaction.setPaymentType(newHistoryTransaction.getPaymentType());
+                    }
+                    if (newHistoryTransaction.getCreditCard() != null) {
+                        historyTransaction.setCreditCard(newHistoryTransaction.getCreditCard());
+                    }
                     historyTransaction.setLastUpdateRow(dateTime.format(formatter));
                     return historyTransactionRepo.save(historyTransaction);
                 })

@@ -9,6 +9,8 @@ public class HistoryTransaction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Long sum;
+    private String paymentType;
+    private String creditCard;
     private String date;
     private String lastUpdateRow;
 
@@ -26,6 +28,22 @@ public class HistoryTransaction {
 
     public void setSum(Long sum) {
         this.sum = sum;
+    }
+
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType;
+    }
+
+    public String getCreditCard() {
+        return creditCard;
+    }
+
+    public void setCreditCard(String creditCard) {
+        this.creditCard = creditCard;
     }
 
     public String getDate() {
