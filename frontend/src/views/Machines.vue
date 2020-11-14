@@ -1,13 +1,17 @@
 <template>
   <v-app>
-    <v-card style="margin: 8% 15% 0 15%">
+    <v-card style="margin: 6% 15% 0 15%">
       <v-text-field
           @input="searchMachine"
           v-model="searchVal"
           :label="curLocale.searchLabel"
+          prepend-inner-icon="search"
           rounded
       >
-        <v-icon slot="append">search</v-icon>
+<!--        <v-icon slot="append">search</v-icon>-->
+        <v-icon @click="clearSearch" slot="append">
+          close
+        </v-icon>
       </v-text-field>
     </v-card>
     <v-card style="margin: 2% 5% 0 5%" flat>
@@ -20,7 +24,7 @@
 <script>
 import MachineList from "@/components/MachineList";
 const axios = require('axios')
-const ip = "192.168.0.153"
+const ip =  "localhost"
 const port = "9000"
 
 export default {
@@ -39,11 +43,17 @@ export default {
           searchLabel: 'Input name of washing machine',
           machines: {
             cardTitle: 'Available machines:',
-            capacity: 'Capacity',
+            status: 'Status machine:',
+            capacity: 'Capacity:',
             litres: 'L.',
             currency: 'uah.',
-            description: 'Description',
-            price: 'Price of 1 kg',
+            description: 'Description:',
+            price: 'Price of 1 kg:',
+            labels: [
+                'Machine is successfully ordered',
+                'Error of order',
+                'You already ordered this machine!'
+            ],
             btnTitle: 'To order'
           }
         },
@@ -51,11 +61,17 @@ export default {
           searchLabel: 'Введите название стиральной машини',
           machines: {
             cardTitle: 'Доступные машини:',
-            capacity: 'Вместимость',
+            status: 'Статус машини:',
+            capacity: 'Вместимость:',
             litres: 'л.',
             currency: 'грн.',
-            description: 'Описание',
-            price: 'Цена за 1 кг',
+            description: 'Описание:',
+            price: 'Цена за 1 кг:',
+            labels: [
+              'Машина успешно заказа',
+              'Ошибка заказа',
+              'Вы уже заказали эту машину!'
+            ],
             btnTitle: 'Заказать'
           }
         },
@@ -63,11 +79,17 @@ export default {
           searchLabel: 'Введіть назву пральної машини',
           machines: {
             cardTitle: 'Доступні машини:',
+            status: 'Статус машини:',
             capacity: 'Місткість',
             litres: 'л.',
             currency: 'грн.',
             description: 'Опис',
-            price: 'Ціна за 1 кг',
+            price: 'Ціна за 1 кг:',
+            labels: [
+              'Машина успішно замовлена',
+              'Помилка при замовленні',
+              'Ви вже замовили цю машину!'
+            ],
             btnTitle: 'Замовити'
           }
         }
@@ -77,6 +99,11 @@ export default {
     }
   },
   methods: {
+    clearSearch() {
+      this.searchVal = ''
+      axios.get(`http://${ip}:${port}/api/machines`)
+          .then(resp => (this.info.machines = resp.data))
+    },
     searchMachine() {
       if (this.searchVal !== '') {
         axios.get(`http://${ip}:${port}/api/machines`)

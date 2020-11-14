@@ -34,7 +34,7 @@
 </template>
 
 <script>
-const ip = "192.168.0.153"
+const ip =  "localhost"
 const port = "9000"
 const axios = require('axios')
 export default {

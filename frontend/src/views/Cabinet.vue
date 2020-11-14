@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-card v-if="authSuccess" style="margin: 8% 15% 0 15%">
+    <v-card v-if="authSuccess" style="margin: 8% 20% 0 20%">
       <v-tabs grow color="indigo">
         <v-tab>{{curLocale.tabsNames[0]}}</v-tab>
         <v-tab>{{curLocale.tabsNames[1]}}</v-tab>
@@ -17,6 +17,7 @@
                       :value="info.userInfo.fName"
                       filled
                       rounded
+                      readonly
                   ></v-text-field>
                 </v-col>
                 <v-col>
@@ -25,6 +26,7 @@
                       :value="info.userInfo.sName"
                       filled
                       rounded
+                      readonly
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -35,6 +37,7 @@
                       :value="info.userInfo.login"
                       filled
                       rounded
+                      readonly
                   ></v-text-field>
                 </v-col>
                 <v-col cols="6">
@@ -43,6 +46,7 @@
                       :value="info.userInfo.email"
                       filled
                       rounded
+                      readonly
                   ></v-text-field>
                 </v-col>
                 <v-col>
@@ -51,6 +55,7 @@
                       :value="info.userInfo.phone"
                       filled
                       rounded
+                      readonly
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -66,7 +71,7 @@
                 </v-card-subtitle>
               </v-card-title>
               <v-divider></v-divider>
-              <v-list v-if="info.userInfo.machine.length > 0">
+              <v-list v-if="info.userInfo.machine.length > 0" style="overflow-y: scroll; height: 200px">
                 <v-list-group v-for="(item, i) in info.userInfo.machine" :key="i">
                   <template v-slot:activator>
                     <v-list-item-title>
@@ -82,14 +87,31 @@
                     <v-container>
                       <v-row>
                         <v-col>
-                          <v-img width="140" height="140" :src="item.img"></v-img>
+                          <v-text-field
+                              :label="curLocale.tabItems[0].curOrders.machine.listInfo[0]"
+                              :placeholder="item.price + ' ' + curLocale.tabItems[0].curOrders.machine.listInfo[1]"
+                              filled
+                              rounded
+                              readonly
+                          ></v-text-field>
                         </v-col>
                         <v-col>
-                          <v-list-item-title>
-                            {{curLocale.tabItems[0].curOrders.machine.listInfo[0]}} {{item.price}} {{curLocale.tabItems[0].curOrders.machine.listInfo[1]}} <br/>
-                            {{curLocale.tabItems[0].curOrders.machine.listInfo[2]}} {{item.description}} <br/>
-                            {{curLocale.tabItems[0].curOrders.machine.listInfo[3]}} {{item.capacity}}{{curLocale.tabItems[0].curOrders.machine.listInfo[4]}}
-                          </v-list-item-title>
+                          <v-text-field
+                              :label="curLocale.tabItems[0].curOrders.machine.listInfo[2]"
+                              :placeholder="item.description"
+                              filled
+                              rounded
+                              readonly
+                          ></v-text-field>
+                        </v-col>
+                        <v-col>
+                          <v-text-field
+                              :label="curLocale.tabItems[0].curOrders.machine.listInfo[3]"
+                              :placeholder="item.capacity + ' ' + curLocale.tabItems[0].curOrders.machine.listInfo[4]"
+                              filled
+                              rounded
+                              readonly
+                          ></v-text-field>
                         </v-col>
                       </v-row>
                     </v-container>
@@ -106,14 +128,15 @@
             <v-container>
               <v-row>
                 <v-col>
-                  <v-card-subtitle>
-                    {{curLocale.tabItems[0].balance.typeTransTitle}}
-                  </v-card-subtitle>
-                  <v-divider></v-divider>
                   <v-row>
                     <v-col>
+                      <v-card-subtitle>
+                        {{curLocale.tabItems[0].balance.typeTransTitle}}
+                      </v-card-subtitle>
+                      <v-divider></v-divider>
                       <v-row>
                         <v-col cols="12">
+
                           <v-dialog max-width="420" persistent v-model="payCreditCard">
                             <template v-slot:activator="{on, attrs}">
                               <v-btn outlined color="indigo" block v-on="on" v-bind="attrs">
@@ -225,7 +248,7 @@
                         <v-list-group>
                           <template v-slot:activator>
                             <v-list-item-title>
-                              {{curLocale.tabItems[0].histories.subtitle}} {{info.userInfo.wallet.balance}} {{curLocale.tabItems[0].histories.subtitle[1]}}
+                              {{curLocale.tabItems[0].histories.subtitle[0]}} {{info.userInfo.wallet.balance}} {{curLocale.tabItems[0].histories.subtitle[1]}}
                             </v-list-item-title>
                           </template>
                           <v-list-group sub-group no-action color="indigo">
@@ -289,7 +312,9 @@
         </v-tab-item>
         <v-tab-item>
           <v-list v-if="info.drafts.length > 0">
-            <v-card-title>{{curLocale.tabItems[1].title}}</v-card-title>
+            <v-card-title style="justify-content: center">
+              {{curLocale.tabItems[1].title}}
+            </v-card-title>
             <v-divider></v-divider>
             <v-list-group v-for="(item, i) in info.drafts" :key="i">
               <template v-slot:activator>
@@ -358,7 +383,9 @@
           </div>
         </v-tab-item>
         <v-tab-item>
-          <v-card-title>{{ curLocale.tabItems[2].title }}</v-card-title>
+          <v-card-title style="justify-content: center">
+            {{ curLocale.tabItems[2].title }}
+          </v-card-title>
           <v-divider></v-divider>
           <form>
             <v-container>
@@ -400,7 +427,7 @@
                       <v-text-field
                           :label="curLocale.tabItems[2].editForm.pwd"
                           type="password"
-                          :placeholder="info.userInfo.pwd"
+                          placeholder="********"
                           outlined
                       ></v-text-field>
                       <v-text-field
@@ -434,7 +461,7 @@
 </template>
 
 <script>
-const ip = "192.168.0.153"
+const ip =  "localhost"
 const port = "9000"
 const axios = require('axios')
 export default {
@@ -512,7 +539,7 @@ export default {
               histories: {
                 title: 'History of transactions',
                 subtitle: [
-                    'Summa', 'UAH'
+                    'Balance', 'UAH'
                 ],
                 lstItems: [
                     'Information of wallet',
@@ -545,7 +572,7 @@ export default {
               listIsEmptyTitle: 'Orders not found'
             },
             {
-              title: 'Settings of account',
+              title: 'Settings',
               editForm: {
                 avatar: 'Your Picture',
                 fName: 'First name',

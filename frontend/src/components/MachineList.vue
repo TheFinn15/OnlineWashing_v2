@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col v-for="(item, i) in machines"  v-bind:key="i">
+      <v-col cols="2" v-for="(item, i) in machines" :key="i">
         <Machine :locales="locales"
                  v-bind:machine="item"/>
       </v-col>
@@ -22,9 +22,5 @@ export default {
 </script>
 
 <style scoped>
-  #grid {
-    display: grid;
-    grid-template-columns: repeat(6, auto);
-    grid-gap: 6px;
-  }
+
 </style>

@@ -1113,7 +1113,7 @@ import StockList from "@/components/tables/StockList";
 import DraftList from "@/components/tables/DraftList";
 import WalletList from "@/components/tables/WalletList";
 import HistoryList from "@/components/tables/HistoryList";
-const ip = "192.168.0.153"
+const ip =  "localhost"
 const port = '9000'
 const axios = require('axios')
 
