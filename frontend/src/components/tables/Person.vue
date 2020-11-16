@@ -64,18 +64,30 @@
     <v-list-group sub-group no-action v-if="person.machine.length > 0">
       <template v-slot:activator>
         <v-list-item-content>
-          <v-list-item-title>{{person.machine.name}} {{person.machine.capacity}}</v-list-item-title>
+          <v-list-item-title>
+            Информация о стиральных машинах
+          </v-list-item-title>
         </v-list-item-content>
       </template>
-      <v-list-item>
-        <v-list-item-title>Описание: {{person.machine.description}}</v-list-item-title>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-title>Цена: {{person.machine.price}}</v-list-item-title>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-title>Дата измений строки: {{person.machine.lastUpdateRow}}</v-list-item-title>
-      </v-list-item>
+      <v-list-group sub-group no-action v-for="(item, i) in person.machine" :key="i">
+        <template v-slot:activator>
+          <v-list-item-content>
+            <v-list-item-title>ID: {{item.id}} | {{item.name}} | {{item.capacity}} л.</v-list-item-title>
+          </v-list-item-content>
+        </template>
+        <v-list-item>
+          <v-list-item-title>Вместимость: {{item.capacity}} л.</v-list-item-title>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-title>Описание: {{item.description}}</v-list-item-title>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-title>Цена: {{item.price}} ГРН.</v-list-item-title>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-title>Дата измений строки: {{item.lastUpdateRow}}</v-list-item-title>
+        </v-list-item>
+      </v-list-group>
     </v-list-group>
     <v-list-group sub-group no-action v-else>
       <template v-slot:activator>

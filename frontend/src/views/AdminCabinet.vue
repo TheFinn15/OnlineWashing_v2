@@ -6,20 +6,20 @@
         <v-tab>Отчеты</v-tab>
         <v-tab>Статистика</v-tab>
         <v-tab-item>
-          <v-card-title>Управление данными</v-card-title>
+          <v-card-title style="justify-content: center">
+            Управление данными
+          </v-card-title>
           <v-divider></v-divider>
-          <v-container>
-            <v-row>
-              <v-col cols="4" v-for="(item, i) in tablesInfo.tablesName" :key="i">
-                <v-card max-width="200" style="margin: 2%" :name="item">
+          <v-container fluid>
+            <v-row no-gutters justify="space-between">
+              <v-col cols="3" v-for="(item, i) in tablesInfo.tablesName" :key="i">
+                <v-card width="280px" style="margin: 2%" :name="item">
                   <v-card-subtitle>{{ item }}</v-card-subtitle>
                   <v-card-text>
                     <b>Кол-во записей:</b> <br/> {{tablesInfo.countsRows[item.toLowerCase()]}} <br/>
-                    <b>Дата изменения:</b> <br/> {{tablesInfo.datesEdits[[item.toLowerCase()]]}}
+                    <b>Дата изменения:</b> <br/> {{tablesInfo.datesEdits[item.toLowerCase()]}}
                   </v-card-text>
-                  <br>
-                  <br>
-                  <v-btn color="indigo" outlined width="100%" @click="handleTable">Подробнее</v-btn>
+                  <v-btn color="indigo" outlined block @click="handleTable">Подробнее</v-btn>
                 </v-card>
               </v-col>
             </v-row>
@@ -477,6 +477,24 @@
                         </v-menu>
                       </v-col>
                     </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-select
+                            label="Выберите вид оплаты:"
+                            :items="histories.paymentsType"
+                            outlined
+                            v-model="forms.histories.paymentType"
+                        ></v-select>
+                      </v-col>
+                      <v-col v-if="forms.histories.paymentType === 'Кредитной картой'">
+                        <v-text-field
+                            label="Номер карты:"
+                            :rules="rulesNum"
+                            outlined
+                            v-model="forms.histories.creditCard"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
                   </v-container>
                 </v-tab-item>
                 <v-tab-item>
@@ -843,6 +861,27 @@
                         </v-menu>
                       </v-col>
                     </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-select
+                            label="Выберите вид оплаты:"
+                            :items="histories.paymentsType"
+                            outlined
+                            v-model="forms.histories.paymentType"
+                            @input="doClearCreditNums"
+                            :placeholder="forms.histories.paymentType"
+                        ></v-select>
+                      </v-col>
+                      <v-col v-if="forms.histories.paymentType === 'Кредитной картой'">
+                        <v-text-field
+                            label="Кредитная карта:"
+                            :rules="rulesNum"
+                            outlined
+                            :placeholder="editForm.histories.creditCard"
+                            v-model="forms.histories.creditCard"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
                   </v-container>
                 </v-tab-item>
                 <v-tab-item>
@@ -943,164 +982,233 @@
         </v-tab-item>
         <v-tab-item>
           <v-list>
-            <v-list-group>
+            <v-list-group v-if="reports.monthlyDrafts.length > 0">
               <template v-slot:activator>
                 <v-list-item-title>
                   Чеки за этот месяц
                 </v-list-item-title>
               </template>
-              <div v-if="reports[0]  !== null">
-                <v-list-item v-for="(item, i) in reports[0] " :key="i">
+              <v-list-item v-for="(item, i) in reports.monthlyDrafts " :key="i">
+                <v-list-group sub-group no-action color="indigo">
+                  <template v-slot:activator>
+                    <v-list-item-title>
+                      ID: {{item.id}} | {{item.price}} UAH | {{item.date}}
+                    </v-list-item-title>
+                  </template>
                   <v-list-group sub-group no-action color="indigo">
                     <template v-slot:activator>
-                      <v-list-item-title>
-                        ID: {{item.id}} | {{item.price}} UAH | {{item.date}}
-                      </v-list-item-title>
-                    </template>
-                    <v-list-group sub-group no-action color="indigo">
-                      <template v-slot:activator>
-                        <v-list-item-content>
-                          <v-list-item-title>Информация о чеке</v-list-item-title>
-                        </v-list-item-content>
-                      </template>
-                      <v-list-item>
-                        <v-list-group sub-group no-action color="indigo">
-                          <template v-slot:activator>
-                            <v-list-item-title>
-                              Пользователь: ID: {{item.person.id}} | {{item.person.fName}} {{item.person.sName}}
-                            </v-list-item-title>
-                          </template>
-                          <v-list-item>
-                            <v-list-item-title>
-                              Текущий баланс: {{item.person.wallet.balance}} UAH
-                            </v-list-item-title>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-title>
-                              Логин: {{item.person.login}}
-                            </v-list-item-title>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-title>
-                              E-mail: {{item.person.email}}
-                            </v-list-item-title>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-title>
-                              Телефон: {{item.person.phone}}
-                            </v-list-item-title>
-                          </v-list-item>
-                        </v-list-group>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-group sub-group no-action color="indigo">
-                          <template v-slot:activator>
-                            <v-list-item-title>
-                              Стиральная машина: ID: {{item.machine.id}} | {{item.machine.name}} | {{item.machine.capacity}}
-                            </v-list-item-title>
-                          </template>
-                          <v-list-item>
-                            <v-list-item-title>
-                              Цена за 1 кг: {{item.machine.price}}
-                            </v-list-item-title>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-title>
-                              Описание: {{item.machine.description}}
-                            </v-list-item-title>
-                          </v-list-item>
-                          <v-list-item>
-                            <v-list-item-title>
-                              Текущий статус: {{item.machine.status}}
-                            </v-list-item-title>
-                          </v-list-item>
-                        </v-list-group>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-item-title>Уплаченная цена: {{item.price}} UAH</v-list-item-title>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-item-title>Объем вещей: {{item.volume}} кг</v-list-item-title>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-item-title>
-                          Вид оплаты: {{item.paymentType}}
-                        </v-list-item-title>
-                        <v-list-item-subtitle v-if="item.paymentType === 'Картой'">
-                          Кредитная карта: {{item.creditCard}}
-                        </v-list-item-subtitle>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-group sub-group no-action color="indigo">
-                          <template v-slot:activator>
-                            <v-list-item-title>
-                              Хим. добавки к стирке
-                            </v-list-item-title>
-                          </template>
-                          <v-list-item v-for="(item, i) in item.additional" :key="i">
-                            <v-list-item-title>
-                              {{item}}
-                            </v-list-item-title>
-                          </v-list-item>
-                        </v-list-group>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-item-title>Дата обновления записи: {{item.lastUpdateRow}}</v-list-item-title>
-                      </v-list-item>
-                    </v-list-group>
-                  </v-list-group>
-                </v-list-item>
-              </div>
-              <div v-else style="padding: 5%">
-                <v-icon large style="text-align: center; display: block">
-                  warning
-                </v-icon>
-                <v-card-title style="text-align: center; display: block">
-                  Отсутствуют
-                </v-card-title>
-              </div>
-            </v-list-group>
-            <v-list-group>
-              <template v-slot:activator>
-                <v-list-item-title>
-                  Не рабочие машины
-                </v-list-item-title>
-              </template>
-              <div v-if="reports[1] !== null">
-                <v-list-item v-for="(item, i) in reports[1]" :key="i">
-                  <v-list-group sub-group no-action color="indigo">
-                    <template slot="activator">
-                      <v-list-item-title>
-                        ID: {{item.id}} | {{item.name}} {{item.capacity}}
-                      </v-list-item-title>
+                      <v-list-item-content>
+                        <v-list-item-title>Информация о чеке</v-list-item-title>
+                      </v-list-item-content>
                     </template>
                     <v-list-item>
-                      <v-list-item-title>Описание: {{item.description}}</v-list-item-title>
+                      <v-list-group sub-group no-action color="indigo">
+                        <template v-slot:activator>
+                          <v-list-item-title>
+                            Пользователь: ID: {{item.person.id}} | {{item.person.fName}} {{item.person.sName}}
+                          </v-list-item-title>
+                        </template>
+                        <v-list-item>
+                          <v-list-item-title>
+                            Текущий баланс: {{item.person.wallet.balance}} UAH
+                          </v-list-item-title>
+                        </v-list-item>
+                        <v-list-item>
+                          <v-list-item-title>
+                            Логин: {{item.person.login}}
+                          </v-list-item-title>
+                        </v-list-item>
+                        <v-list-item>
+                          <v-list-item-title>
+                            E-mail: {{item.person.email}}
+                          </v-list-item-title>
+                        </v-list-item>
+                        <v-list-item>
+                          <v-list-item-title>
+                            Телефон: {{item.person.phone}}
+                          </v-list-item-title>
+                        </v-list-item>
+                      </v-list-group>
                     </v-list-item>
                     <v-list-item>
-                      <v-list-item-title>Статус машини: {{item.status}}</v-list-item-title>
+                      <v-list-group sub-group no-action color="indigo">
+                        <template v-slot:activator>
+                          <v-list-item-title>
+                            Стиральная машина: ID: {{item.machine.id}} | {{item.machine.name}} | {{item.machine.capacity}}
+                          </v-list-item-title>
+                        </template>
+                        <v-list-item>
+                          <v-list-item-title>
+                            Цена за 1 кг: {{item.machine.price}}
+                          </v-list-item-title>
+                        </v-list-item>
+                        <v-list-item>
+                          <v-list-item-title>
+                            Описание: {{item.machine.description}}
+                          </v-list-item-title>
+                        </v-list-item>
+                        <v-list-item>
+                          <v-list-item-title>
+                            Текущий статус: {{item.machine.status}}
+                          </v-list-item-title>
+                        </v-list-item>
+                      </v-list-group>
                     </v-list-item>
                     <v-list-item>
-                      <v-list-item-title>Цена за 1 кг: {{item.price}}</v-list-item-title>
+                      <v-list-item-title>Уплаченная цена: {{item.price}} UAH</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-title>Объем вещей: {{item.volume}} кг</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-title>
+                        Вид оплаты: {{item.paymentType}}
+                      </v-list-item-title>
+                      <v-list-item-subtitle v-if="item.paymentType === 'Картой'">
+                        Кредитная карта: {{item.creditCard}}
+                      </v-list-item-subtitle>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-group sub-group no-action color="indigo">
+                        <template v-slot:activator>
+                          <v-list-item-title>
+                            Хим. добавки к стирке
+                          </v-list-item-title>
+                        </template>
+                        <v-list-item v-for="(item, i) in item.additional" :key="i">
+                          <v-list-item-title>
+                            {{item}}
+                          </v-list-item-title>
+                        </v-list-item>
+                      </v-list-group>
                     </v-list-item>
                     <v-list-item>
                       <v-list-item-title>Дата обновления записи: {{item.lastUpdateRow}}</v-list-item-title>
                     </v-list-item>
                   </v-list-group>
-                </v-list-item>
-              </div>
-              <div v-else style="padding: 5%">
-                <v-icon large style="text-align: center; display: block">
-                  warning
-                </v-icon>
-                <v-card-title style="text-align: center; display: block">
-                  Отсутствуют
-                </v-card-title>
-              </div>
+                </v-list-group>
+              </v-list-item>
+            </v-list-group>
+            <v-list-group append-icon="warning" no-action disabled v-else>
+              <template v-slot:activator>
+                <v-list-item-title>
+                  Не рабочие машины
+                  <v-card-subtitle>
+                    Отсутствуют
+                  </v-card-subtitle>
+                </v-list-item-title>
+              </template>
+            </v-list-group>
+            <v-list-group v-if="reports.babMachines.length > 0">
+              <template v-slot:activator>
+                <v-list-item-title>
+                  Не рабочие машины
+                </v-list-item-title>
+              </template>
+              <v-list-item v-for="(item, i) in reports.babMachines" :key="i">
+                <v-list-group sub-group no-action color="indigo">
+                  <template slot="activator">
+                    <v-list-item-title>
+                      ID: {{item.id}} | {{item.name}} {{item.capacity}}
+                    </v-list-item-title>
+                  </template>
+                  <v-list-item>
+                    <v-list-item-title>Описание: {{item.description}}</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title>Статус машини: {{item.status}}</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title>Цена за 1 кг: {{item.price}}</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title>Дата обновления записи: {{item.lastUpdateRow}}</v-list-item-title>
+                  </v-list-item>
+                </v-list-group>
+              </v-list-item>
+            </v-list-group>
+            <v-list-group append-icon="warning" no-action disabled v-else>
+              <template v-slot:activator>
+                <v-list-item-title>
+                  Не рабочие машины
+                  <v-card-subtitle>
+                    Отсутствуют
+                  </v-card-subtitle>
+                </v-list-item-title>
+              </template>
             </v-list-group>
           </v-list>
         </v-tab-item>
-        <v-tab-item></v-tab-item>
+        <v-tab-item>
+          <v-card flat>
+            <v-container>
+              <v-row no-gutters justify="center">
+                <v-col cols="6">
+                  <v-select
+                      label="Статистика по:"
+                      append-icon="trending_up"
+                      v-model="statistic.type"
+                      :items="statistic.types"
+                      outlined
+                  ></v-select>
+                </v-col>
+              </v-row>
+            </v-container>
+            <v-divider></v-divider>
+            <div v-if="statistic.type === 'Заказам'">
+              <v-menu offset-x>
+                <template v-slot:activator="{on, attrs}">
+                  <v-btn icon v-bind="attrs" v-on="on">
+                    <v-icon>
+                      info
+                    </v-icon>
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-text>
+                    <span class="red--text">
+                      Красный
+                    </span> - очень слабое кол-во заказов <br>
+                      <span class="primary--text">
+                      Синий
+                    </span> - слабое кол-во заказов <br>
+                      <span class="indigo--text">
+                      Темно-синий
+                    </span> - среднее кол-во заказов <br>
+                      <span class="success--text">
+                      Зеленный
+                    </span> - хорошее кол-во заказов
+                  </v-card-text>
+                </v-card>
+              </v-menu>
+              <v-card v-for="(item, i) in calcPercent" :key="i" :color="item.color" style="margin: 5%">
+                <v-card-title>
+                  {{item.name}}
+                  <v-menu offset-x transition="scale-transition">
+                    <template v-slot:activator="{on, attrs}">
+                      <v-btn icon v-bind="attrs" v-on="on">
+                        <v-icon>
+                          keyboard_arrow_right
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-text>
+                        <b>Цена:</b> {{item.price}} ГРН.<br>
+                        <b>Описание:</b> {{item.description}} <br>
+                        <b>Вместимость:</b> {{item.capacity}} л.
+                      </v-card-text>
+                    </v-card>
+                  </v-menu>
+                  <v-spacer></v-spacer>
+                  <v-card-subtitle>
+                    Кол-во заказаов: {{item.count}}
+                  </v-card-subtitle>
+                </v-card-title>
+              </v-card>
+            </div>
+          </v-card>
+        </v-tab-item>
       </v-tabs>
     </v-card>
   </v-app>
@@ -1123,7 +1231,13 @@ export default {
   data() {
     return {
       chosenDate: new Date().toISOString().substr(0, 10),
-      reports: [],
+      reports: {
+        babMachines: [],
+        monthlyDrafts: []
+      },
+      activeBtnTable: 'default',
+      prevBtnTable: false,
+      nextBtnTable: true,
       searchTextChosenTable: null,
       tablesInfo: {
         tablesName: [
@@ -1135,7 +1249,7 @@ export default {
           stocks: '',
           drafts: '',
           wallets: '',
-          Histories: ''
+          histories: ''
         },
         datesEdits: {
           persons: '',
@@ -1143,7 +1257,7 @@ export default {
           stocks: '',
           drafts: '',
           wallets: '',
-          Histories: ''
+          histories: ''
         }
       },
       chosenTableInfo: null,
@@ -1161,7 +1275,8 @@ export default {
         persons: [],
         wallets: [],
         histories: [],
-        stocks: []
+        stocks: [],
+        drafts: []
       },
       rulesNum: [
         v => v > 0 || 'Число должно быть больше 0'
@@ -1178,6 +1293,15 @@ export default {
       alertSuccess: false,
       alertErr: false,
       alertText: '',
+      histories: {
+        paymentsType: ['Наличкой', 'Кредитной картой'],
+      },
+      statistic: {
+        types: [
+          'Заказам'
+        ],
+        type: 'Заказам'
+      },
       forms: {
         persons: {
           fName: '',
@@ -1220,6 +1344,8 @@ export default {
           balance: ''
         },
         histories: {
+          paymentType: '',
+          creditCard: '',
           sum: '',
           date: ''
         },
@@ -1233,6 +1359,33 @@ export default {
     }
   },
   computed: {
+    calcPercent() {
+      let res = []
+      let unique = []
+      let count = 0
+      for (let i=0;i<this.editForm.drafts.length;i++) {
+        let curItem = this.editForm.drafts[i].machine
+        if (unique.indexOf(curItem.name) < 0) {
+          for (let j=0;j<this.editForm.drafts.length;j++) {
+            let item = this.editForm.drafts[i].machine
+            if (curItem.name === item.name) {
+              count++;
+            }
+          }
+          res.push({
+            name: curItem.name,
+            count: count,
+            price: curItem.price,
+            capacity: curItem.capacity,
+            description: curItem.description,
+            color: count >= 25?'success': count >= 15?'indigo':count >= 10?'primary':'red'
+          })
+          unique.push(curItem.name)
+          count = 0
+        }
+      }
+      return res;
+    },
     renderMachineForChoose() {
       return this.editForm.machines.map(i => 'ID: ' + i.id + ' | ' + i.name + ' | ' + i.capacity)
     },
@@ -1241,6 +1394,9 @@ export default {
     }
   },
   methods: {
+    doClearCreditNums() {
+      this.forms.histories.creditCard = '';
+    },
     reFormateDate() {
       const [year, month, day] = this.chosenDate.split('-')
       if (this.chosenTable === 'Stocks') this.forms.stocks.lastTerm = `${month}/${day}/${year}`;
@@ -1253,13 +1409,12 @@ export default {
       this.chosenTableInfo = null
     },
     doSearchInTable() {
-      let regex = new RegExp(this.searchTextChosenTable, 'i')
       if (this.chosenTable === 'Persons') {
         axios({
           method: 'GET',
           url: `http://${ip}:${port}/api/persons`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.id || i.fName + ' ' + i.sName || i.fName || i.sName))
+          this.chosenTableInfo = resp.data.filter(i => i.id.toString().includes(this.searchTextChosenTable) || (i.fName + ' ' + i.sName).includes(this.searchTextChosenTable) || i.fName.includes(this.searchTextChosenTable) || i.sName.includes(this.searchTextChosenTable))
         })
       }
       else if (this.chosenTable === 'Machines') {
@@ -1267,7 +1422,7 @@ export default {
           method: 'GET',
           url: `http://${ip}:${port}/api/machines`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.id || i.name))
+          this.chosenTableInfo = resp.data.filter(i => i.id.toString().includes(this.searchTextChosenTable) || i.name.includes(this.searchTextChosenTable) || i.status.includes(this.searchTextChosenTable) || i.capacity.toString().includes(this.searchTextChosenTable) || i.price.toString().includes(this.searchTextChosenTable))
         })
       }
       else if (this.chosenTable === 'Drafts') {
@@ -1275,7 +1430,7 @@ export default {
           method: 'GET',
           url: `http://${ip}:${port}/api/drafts`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.testi.id || (i.paymentType))
+          this.chosenTableInfo = resp.data.filter(i => i.id.toString().includes(this.searchTextChosenTable) || i.paymentType.includes(this.searchTextChosenTable) || i.machine.name.includes(this.searchTextChosenTable) || i.person.fName.includes(this.searchTextChosenTable) || i.person.sName.includes(this.searchTextChosenTable) || i.person.fName.includes(this.searchTextChosenTable) + ' ' + i.person.sName.includes(this.searchTextChosenTable))
         })
       }
       else if (this.chosenTable === 'Wallets') {
@@ -1283,15 +1438,15 @@ export default {
           method: 'GET',
           url: `http://${ip}:${port}/api/wallets`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.id || i.balance))
+          this.chosenTableInfo = resp.data.filter(i => i.id.toString().includes(this.searchTextChosenTable) || i.balance.includes(this.searchTextChosenTable))
         })
       }
-      else if (this.chosenTable === 'histories') {
+      else if (this.chosenTable === 'Histories') {
         axios({
           method: 'GET',
-          url: `http://${ip}:${port}/api/persons`
+          url: `http://${ip}:${port}/api/histories`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.id || i.sum || i.date))
+          this.chosenTableInfo = resp.data.filter(i => i.id.toString().includes(this.searchTextChosenTable) || i.sum.toString().includes(this.searchTextChosenTable) || i.date.includes(this.searchTextChosenTable) || i.paymentType.includes(this.searchTextChosenTable))
         })
       }
       else if (this.chosenTable === 'Stocks') {
@@ -1299,7 +1454,7 @@ export default {
           method: 'GET',
           url: `http://${ip}:${port}/api/stocks`
         }).then(resp => {
-          this.chosenTableInfo = resp.data.filter(i => regex.test(i.id || i.name || i.sponsor || i.discount))
+          this.chosenTableInfo = resp.data.filter(i => i.id.toString().includes(this.searchTextChosenTable) || i.name.includes(this.searchTextChosenTable) || i.sponsor.includes(this.searchTextChosenTable) || i.discount.toString().includes(this.searchTextChosenTable))
         })
       }
       else {
@@ -1381,8 +1536,11 @@ export default {
           url: `http://${ip}:${port}/api/${table.toLowerCase()}/${curItem}`,
           data: this.forms[table.toLowerCase()]
         }).then(resp => {
-          console.log(resp)
-          this.chosenTableInfo = this.chosenTableInfo.filter(i => i.id !== resp.data.id)
+          this.chosenTableInfo = this.chosenTableInfo.filter(i => {
+            if (i.id !== resp.data.id && i.id !== '') {
+              return i;
+            }
+          })
           this.chosenTableInfo.push(resp.data)
         })
         for (let item of Object.keys(this.forms[table.toLowerCase()])) {
@@ -1470,6 +1628,7 @@ export default {
         .then(resp => {
           if (resp.data.length > 0) {
             this.tablesInfo.countsRows.drafts = resp.data.length
+            this.editForm.drafts = resp.data
             this.tablesInfo.datesEdits.drafts = resp.data[resp.data.length-1].lastUpdateRow
           } else {
             this.tablesInfo.countsRows.drafts = 0
@@ -1503,21 +1662,19 @@ export default {
           if (resp.data.length > 0) {
             this.tablesInfo.countsRows.histories = resp.data.length
             this.editForm.histories = resp.data
-            this.tablesInfo.datesEdits.Histories = resp.data[resp.data.length-1].lastUpdateRow
+            this.tablesInfo.datesEdits.histories = resp.data[resp.data.length-1].lastUpdateRow
           } else {
             this.tablesInfo.countsRows.histories = 0
-            this.tablesInfo.datesEdits.Histories = 'Отсутствует'
+            this.tablesInfo.datesEdits.histories = 'Отсутствует'
           }
         })
     axios.get(`http://${ip}:${port}/api/drafts/reports/monthly-checks`)
         .then(resp => {
-          if (resp.data !== null) this.reports.push(resp.data)
-          else this.reports.push(null)
+          this.reports.monthlyDrafts = resp.data
         })
     axios.get(`http://${ip}:${port}/api/machines/reports/bad-status-machines`)
         .then(resp => {
-          if (resp.data !== null) this.reports.push(resp.data)
-          else this.reports.push(null)
+          this.reports.babMachines = resp.data
         })
   }
 }

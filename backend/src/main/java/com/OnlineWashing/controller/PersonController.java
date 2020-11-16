@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -38,6 +39,11 @@ public class PersonController {
     public Person getOne(@PathVariable("id") Person person){
         if (person == null) throw new PersonNotFoundException();
         return person;
+    }
+
+    @GetMapping("/current")
+    public Person getHeadersInfo(HttpServletRequest request) {
+        return personRepo.findPersonBySessionId(request.getHeader("Authorization"));
     }
 
     @PostMapping

@@ -46,7 +46,7 @@
         </v-card-text>
       </v-card>
     </v-menu>
-    <v-btn block color="primary" @click="orderMachine">{{locales.machines.btnTitle}}</v-btn>
+    <v-btn block color="indigo" outlined @click="orderMachine">{{locales.machines.btnTitle}}</v-btn>
     <v-snackbar
         top
         v-model="alertSuccess"
