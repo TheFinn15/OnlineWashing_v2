@@ -205,21 +205,21 @@
             outlined
             type="success"
         >
-          Регистрация успешна
+          {{curLocale.authForm.successText}}
         </v-alert>
         <v-container>
           <v-row>
             <v-col>
               <v-text-field
                   outlined
-                  label="Имя:"
+                  :label="curLocale.registerForm.labels[0]"
                   v-model="form.fName"
                   :rules="textRules"
                   required
               ></v-text-field>
               <v-text-field
                   outlined
-                  label="Фамилия:"
+                  :label="curLocale.registerForm.labels[1]"
                   v-model="form.sName"
                   :rules="textRules"
                   required
@@ -228,7 +228,7 @@
             <v-col>
               <v-text-field
                   outlined
-                  label="Логин:"
+                  :label="curLocale.registerForm.labels[2]"
                   v-model="form.login"
                   prepend-inner-icon="person"
                   :rules="textRules"
@@ -237,7 +237,7 @@
               <v-text-field
                   type="password"
                   outlined
-                  label="Пароль:"
+                  :label="curLocale.registerForm.labels[3]"
                   v-model="form.pwd"
                   prepend-inner-icon="lock"
                   :rules="textRules"
@@ -249,7 +249,7 @@
             <v-col>
               <v-text-field
                   outlined
-                  label="Телефон:"
+                  :label="curLocale.registerForm.labels[4]"
                   v-model="form.phone"
                   prepend-inner-icon="phone"
                   :rules="phoneRules"
@@ -257,14 +257,14 @@
               ></v-text-field>
               <v-text-field
                   outlined
-                  label="E-mail:"
+                  :label="curLocale.registerForm.labels[5]"
                   v-model="form.email"
                   prepend-inner-icon="email"
                   :rules="emailRules"
                   required
               ></v-text-field>
             </v-col>
-            <v-col title="Ваш аватар">
+            <v-col :title="curLocale.registerForm.labels[6]">
               <v-row no-gutters align="end">
                 <v-col>
                   <v-img style="border: 1px solid lightgray" width="150px" height="142px" :src="form.avatar"></v-img>
@@ -278,7 +278,9 @@
               </v-row>
             </v-col>
           </v-row>
-          <v-btn @click="doRegister" color="indigo" outlined block class="pa-2">СОЗДАТЬ АККАУНТ</v-btn>
+          <v-btn @click="doRegister" color="indigo" outlined block class="pa-2">
+            {{curLocale.registerForm.btnTitle}}
+          </v-btn>
         </v-container>
       </v-card>
     </v-dialog>
@@ -344,6 +346,8 @@
             },
             authForm: {
               title: 'Sign-In',
+              errText: 'Entered data is invalid',
+              successText: 'Successfully authorization',
               labels: [
                 'Login*', 'Password*'
               ],
@@ -353,6 +357,21 @@
               phoneRules: 'Input correct phone number',
               emailRules: 'Input correct e-mail',
               btnTitle: 'ENTER'
+            },
+            registerForm: {
+              title: 'Registration',
+              errText: 'Try later...',
+              successText: 'Successfully registration',
+              labels: [
+                  'First Name:',
+                  'Second Name:',
+                  'Login:',
+                  'Password:',
+                  'Phone:',
+                  "E-mail:",
+                  'Avatar:'
+              ],
+              btnTitle: 'CREATE ACCOUNT'
             }
           },
           'ru-RU': {
@@ -376,6 +395,8 @@
             },
             authForm: {
               title: 'Авторизация',
+              errText: 'Попробуйте позже...',
+              successText: 'Успешная авторизация',
               labels: [
                 'Логин*', 'Пароль*'
               ],
@@ -385,6 +406,21 @@
               phoneRules: 'Введите верный телефон',
               emailRules: 'Введите верный e-mail',
               btnTitle: 'ВОЙТИ'
+            },
+            registerForm: {
+              title: 'Регистрация',
+              errText: 'Попробуйте позже...',
+              successText: 'Успешная регистрация',
+              labels: [
+                'Имя:',
+                'Фамилия:',
+                'Логин:',
+                'Пароль:',
+                'Телефон:',
+                "E-mail:",
+                'Ваш аватар:'
+              ],
+              btnTitle: 'СОЗДАТЬ АККАУНТ'
             }
           },
           'ua-UA': {
@@ -408,6 +444,8 @@
             },
             authForm: {
               title: 'Авторизація',
+              errText: 'Спробуйте пізніше...',
+              successText: 'Авторизація успішна',
               labels: [
                 'Логін*', 'Пароль*'
               ],
@@ -417,6 +455,21 @@
               phoneRules: 'Напишіть коректний телефон',
               emailRules: 'Напишіть коректний e-mail',
               btnTitle: 'ВІЙТИ'
+            },
+            registerForm: {
+              title: 'Реєстрація',
+              errText: 'Спробуйте пізніше...',
+              successText: 'Реэстрація успішна',
+              labels: [
+                'Ім`я:',
+                'Прізвище:',
+                'Логін:',
+                'Пароль:',
+                'Телефон:',
+                "E-mail:",
+                'Ваш аватар:'
+              ],
+              btnTitle: 'СТВОРИТИ АККАУНТ'
             }
           }
         },
@@ -495,22 +548,7 @@
         this.imgSelected = true;
       },
       doLogout() {
-        axios.get(`http://${ip}:${port}/api/persons`)
-            .then(resp => {
-              let uId = resp.data.filter(i => i.sessionId === localStorage.getItem('uid')).map(i => i.id)[0]
-              axios({
-                method: 'PUT',
-                url: `http://${ip}:${port}/api/persons/`+uId,
-                data: {
-                  sessionId: ''
-                }
-              })
-                  .then(resp1 => {
-                    console.log(resp1)
-                    localStorage.removeItem('uid')
-                  })
-                  .catch(err => console.log('catch error', err))
-            })
+        localStorage.removeItem('sid')
         this.isAuth = false;
         // window.history.go();
       },
@@ -530,64 +568,37 @@
         this.$router.go(this.$router.currentRoute.path);
       },
       doAuth() {
-        let req = new XMLHttpRequest()
-        req.open('GET', `http://${ip}:${port}/api/persons`, false)
-        req.send()
-        let userId = null
-        let info = JSON.parse(req.responseText).filter(i => {
-          if (i.login === this.login && i.pwd === this.pwd) {
-            userId = i.id;
-            return i;
-          }
+        axios.post(`http://${ip}:${port}/api/auth`, {
+          login: this.login,
+          pwd: this.pwd
         })
-        if (info.length > 0) {
-          this.errForm = false
-          let alpha = 'abcdefghijklmnopqrstuvwxyz'.split('');
-          let sId = ''
-          for (let i=0;i<25;i++) {
-            let randChoose = Math.floor(Math.random()*2)
-            if (randChoose === 0) {
-              sId += alpha[i]
-            } else {
-              sId += Math.floor(Math.random()*10)
-            }
-          }
-          axios.put(`http://${ip}:${port}/api/persons/`+userId, {
-            sessionId: sId.toUpperCase()
-          })
-              .then(resp => {
-                console.log(resp)
-                localStorage.setItem('uid', sId.toUpperCase())
-              })
-              .catch(err => console.log('catch error', err))
-          this.successForm = true;
-          setTimeout(() => {
-            this.login = ''
-            this.pwd = ''
-            this.authForm = false
-            this.info.userInfo = info
-            window.location.reload()
-          }, 1200)
-        } else {
-          this.errForm = true
-          this.errText = 'Введены неверные данные'
-        }
+            .then(resp => {
+              localStorage.setItem('sid', resp.data['id_token'])
+              this.successForm = true;
+              let req = new XMLHttpRequest();
+              req.open('GET', `http://${ip}:${port}/api/user`)
+              req.setRequestHeader('Authorization', localStorage.getItem('sid'))
+              req.responseType = 'json'
+              req.send()
+              req.onload = () => {
+                setTimeout(() => {
+                  this.login = ''
+                  this.pwd = ''
+                  this.authForm = false
+                  this.info.userInfo = req.response
+                  window.location.reload()
+                }, 1200)
+              }
+            })
+            .catch(() => {
+              this.errForm = true
+              this.errText = this.curLocale.authForm.errText
+            })
       },
       doRegister() {
         if (this.form.fName && this.form.sName && this.form.login && this.form.pwd) {
           if (this.form.email.match('[a-zA-Z]+@[a-zA-Z]+.[a-zA-Z]+') !== null &&
           this.form.phone.match('[0-9]{10}') !== null) {
-            if (this.form.avatar === '') this.form.avatar = 'data:image/png;base64,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'
-            let alpha = 'abcdefghijklmnopqrstuvwxyz'.split('');
-            let sId = ''
-            for (let i=0;i<25;i++) {
-              let randChoose = Math.floor(Math.random()*2)
-              if (randChoose === 0) {
-                sId += alpha[i]
-              } else {
-                sId += Math.floor(Math.random()*10)
-              }
-            }
             let data = {
               fName: this.form.fName,
               sName: this.form.sName,
@@ -595,32 +606,41 @@
               pwd: this.form.pwd,
               phone: this.form.phone,
               email: this.form.email,
-              avatar: this.form.avatar,
-              sessionId: sId
+              avatar: this.form.avatar
             }
             axios({
-              url: `http://${ip}:${port}/api/persons`,
+              url: `http://${ip}:${port}/api/register`,
               method: 'POST',
               data: data
             })
-                .then(resp => {
-                  console.log(resp)
-                  localStorage.setItem('uid', sId)
-                  this.info.userInfo = data
+                .then(() => {
+                  axios({
+                    url: `http://${ip}:${port}/api/auth`,
+                    method: 'POST',
+                    data: {
+                      login: this.form.login,
+                      pwd: this.form.pwd
+                    }
+                  }).then(resp => {
+                    localStorage.setItem('uid', resp.data['id_token'])
+                    this.info.userInfo = data
+                    this.successForm = true;
+                    setTimeout(() => {
+                      for (let item of Object.keys(this.form)) {
+                        this.form[item] = '';
+                      }
+                      this.register = false
+                      window.location.reload()
+                    }, 1500)
+                  }).catch(() => {
+                    this.errForm = true
+                    this.errText = this.curLocale.registerForm.errText
+                  })
                 })
-                .catch(err => {
+                .catch(() => {
                   this.errForm = true
-                  this.errText = 'Ошибка регистрация. Попробуйте позже'
-                  console.log(err)
+                  this.errText = this.curLocale.registerForm.errText
                 })
-            this.successForm = true;
-            setTimeout(() => {
-              for (let item of Object.keys(this.form)) {
-                this.form[item] = '';
-              }
-              this.register = false
-              window.location.reload()
-            }, 1500)
           }
         }
       }
