@@ -35,7 +35,7 @@
 
 <script>
 const ip =  "localhost"
-const port = "9000"
+const port = "25016"
 const axios = require('axios')
 export default {
   name: "AdminAuth",

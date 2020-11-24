@@ -462,7 +462,7 @@
 
 <script>
 const ip =  "localhost"
-const port = "9000"
+const port = "25016"
 const axios = require('axios')
 export default {
   name: "Cabinet",
@@ -834,26 +834,33 @@ export default {
     }
   },
   mounted() {
-    axios.get(`http://${ip}:${port}/api/persons/`)
-      .then(resp => {
-        console.info('session', localStorage.getItem('uid'))
-        if (localStorage.getItem('uid') !== null ) {
-          let info = resp.data.filter(i => i.sessionId === localStorage.getItem('uid'))
-          console.info('data', info)
-          if (info.length > 0) {
-            this.info.userInfo = info[0]
-            axios.get(`http://${ip}:${port}/api/drafts`)
-                .then(resp1 => {
-                  this.info.drafts = resp1.data.filter(i => i.person.id === this.info.userInfo.id);
-                })
-            this.authSuccess = true
-          } else {
-            this.authSuccess = false
+    axios({
+      method: 'GET',
+      url: `http://${ip}:${port}/api/persons`,
+      headers: {
+        Authorization: 'Bearer ' + localStorage['uid']
+      }
+    }).then(resp => {
+      if (resp.data !== null) {
+        this.info.userInfo = resp.data
+        this.authSuccess = true;
+        console.log(this.info.userInfo)
+        console.log(resp.data)
+        axios({
+          url: `http://${ip}:${port}/api/drafts`,
+          method: 'GET',
+          headers: {
+            Authorization: 'Bearer ' + localStorage['uid']
           }
-        } else {
-          this.authSuccess = false
-        }
-      })
+        }).then(resp1 => {
+          this.info.drafts = resp1.data.filter(i => i.person.id === this.info.userInfo.id);
+        }).catch(() => {
+          this.authSuccess = false;
+        })
+      }
+    }).catch(() => {
+      this.authSuccess = false;
+    })
   }
 }
 </script>

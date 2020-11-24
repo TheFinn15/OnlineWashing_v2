@@ -99,7 +99,7 @@
 </template>
 
 <script>
-const [ip, port, axios] = ['localhost', '9000', require('axios')]
+const [ip, port, axios] = ['localhost', '25016', require('axios')]
 export default {
   name: "Machine",
   props: {

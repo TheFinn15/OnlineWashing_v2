@@ -25,7 +25,7 @@
 import MachineList from "@/components/MachineList";
 const axios = require('axios')
 const ip =  "localhost"
-const port = "9000"
+const port = "25016"
 
 export default {
   name: "Home",
