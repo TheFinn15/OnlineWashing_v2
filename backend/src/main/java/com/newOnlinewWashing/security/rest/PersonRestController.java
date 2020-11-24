@@ -1,5 +1,7 @@
 package com.newOnlinewWashing.security.rest;
 
+import com.newOnlinewWashing.models.Wallet;
+import com.newOnlinewWashing.repo.WalletRepo;
 import com.newOnlinewWashing.security.model.Person;
 import com.newOnlinewWashing.security.repo.PersonRepo;
 import com.newOnlinewWashing.security.service.PersonService;
@@ -9,10 +11,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 
 @RestController
@@ -20,6 +23,8 @@ import java.util.Collections;
 public class PersonRestController {
     @Autowired
     private PersonRepo userRepository;
+    @Autowired
+    private WalletRepo walletRepo;
 
     private final PersonService userService;
 
@@ -28,15 +33,27 @@ public class PersonRestController {
         this.userService = userService;
     }
 
-    @GetMapping("/user")
-    public ResponseEntity<Person> getActualUser() {
-        return ResponseEntity.ok(userService.getUserWithAuthorities().get());
+    @GetMapping("/persons")
+    public ResponseEntity<? extends Object> getActualUser() {
+        try {
+            return ResponseEntity.ok(userService.getUserWithAuthorities().get());
+        } catch (Exception e) {
+            return new ResponseEntity<>("Users not exists", HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/register")
     public ResponseEntity<Person> saveUser(@RequestBody @Valid Person user){
         HttpHeaders headers = new HttpHeaders();
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH:mm:ss");
+
+        Wallet wallet = new Wallet();
+        wallet.setBalance(0L);
+        wallet.setLastUpdateRow(dateTime.format(formatter));
+        walletRepo.save(wallet);
 
         if(user == null){
             System.out.println(user.getPwd());
@@ -45,12 +62,15 @@ public class PersonRestController {
         user.setActivated(true);
         user.setAuthorities(Collections.singleton(new Authority("ROLE_USER")));
         user.setPwd(encoder.encode(user.getPwd()));
-        this.userService.save(user);
+        user.setLastUpdateRow(dateTime.format(formatter));
+        user.setWallet(wallet);
+
+        userService.save(user);
 
         return new ResponseEntity<>(user, headers, HttpStatus.CREATED);
     }
 
-    @PutMapping("/user")
+    @PutMapping("/persons")
     public ResponseEntity<Person> updateUser(@RequestBody Person user){
         HttpHeaders headers = new HttpHeaders();
 
@@ -79,7 +99,26 @@ public class PersonRestController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH:mm:ss");
+        user.setLastUpdateRow(dateTime.format(formatter));
+
         this.userService.save(userToChange);
+
+        return new ResponseEntity<>(user, headers, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/persons")
+    public ResponseEntity<Person> delUser(@RequestBody Person user) {
+        HttpHeaders headers = new HttpHeaders();
+
+        Wallet wallet = user.getWallet();
+        Person authUser = userService.getUserWithAuthorities().get();
+
+        Person userToDel = userRepository.findByLogin(authUser.getLogin());
+
+        userRepository.delete(userToDel);
+        walletRepo.delete(wallet);
 
         return new ResponseEntity<>(user, headers, HttpStatus.OK);
     }
