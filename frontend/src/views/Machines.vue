@@ -8,15 +8,16 @@
           prepend-inner-icon="search"
           rounded
       >
-<!--        <v-icon slot="append">search</v-icon>-->
         <v-icon @click="clearSearch" slot="append">
           close
         </v-icon>
       </v-text-field>
     </v-card>
     <v-card style="margin: 2% 5% 0 5%" flat>
-      <v-card-title>{{curLocale.machines.cardTitle}}</v-card-title>
-      <MachineList :locales="curLocale" :machines="info.machines"/>
+      <v-card-title v-if="!recomends">{{curLocale.machines.cardTitle}}</v-card-title>
+      <v-card-title v-else>{{curLocale.machines.recomendTitle}}</v-card-title>
+      <MachineList :locales="curLocale" :machines="info.machines" v-if="!recomends"/>
+      <MachineList :locales="curLocale" :machines="recomendsInfo.machines" v-else/>
     </v-card>
   </v-app>
 </template>
@@ -43,6 +44,7 @@ export default {
           searchLabel: 'Input name of washing machine',
           machines: {
             cardTitle: 'Available machines:',
+            recomendTitle: 'Recommendations:',
             status: 'Status machine:',
             capacity: 'Capacity:',
             litres: 'L.',
@@ -61,6 +63,7 @@ export default {
           searchLabel: 'Введите название стиральной машини',
           machines: {
             cardTitle: 'Доступные машини:',
+            recomendTitle: 'Рекомендации:',
             status: 'Статус машини:',
             capacity: 'Вместимость:',
             litres: 'л.',
@@ -79,11 +82,12 @@ export default {
           searchLabel: 'Введіть назву пральної машини',
           machines: {
             cardTitle: 'Доступні машини:',
+            recomendTitle: 'Рекомендації:',
             status: 'Статус машини:',
-            capacity: 'Місткість',
+            capacity: 'Місткість:',
             litres: 'л.',
             currency: 'грн.',
-            description: 'Опис',
+            description: 'Опис:',
             price: 'Ціна за 1 кг:',
             labels: [
               'Машина успішно замовлена',
@@ -95,7 +99,12 @@ export default {
         }
       },
       searchVal: '',
-      searchItems: null
+      searchItems: null,
+      recomends: false,
+      recomendsInfo: {
+        machines: [],
+        additional: []
+      }
     }
   },
   methods: {
@@ -132,7 +141,17 @@ export default {
       url: `http://${ip}:${port}/api/machines`
     })
       .then(resp => {
-        this.info.machines = resp.data
+        axios.get(`http://${ip}:${port}/api/persons/recommends`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage['uid']
+          }
+        }).then(recomend => {
+          this.recomendsInfo.machines = recomend.data[1]
+          this.recomendsInfo.additional = recomend.data[2]
+          this.recomends = true
+        }).catch(() => {
+          this.info.machines = resp.data
+        })
       })
   }
 }

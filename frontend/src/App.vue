@@ -60,7 +60,7 @@
           <v-divider></v-divider>
           <v-list flat>
             <v-list-item-group>
-              <v-list-item @click="$router.push('/balance')">
+              <v-list-item>
                 <v-list-item-icon><v-icon>attach_money</v-icon></v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>{{info.userInfo.wallet.balance}} {{curLocale.authedUser.menuItems[0]}}</v-list-item-title>
@@ -72,7 +72,7 @@
                   <v-list-item-title>{{curLocale.authedUser.menuItems[1]}}</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item @click="$router.push('/')">
+              <v-list-item @click="goToMain">
                 <v-list-item-icon><v-icon>apps</v-icon></v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>{{curLocale.authedUser.menuItems[2]}}</v-list-item-title>
@@ -504,7 +504,6 @@
           }
         }).then(resp => {
           this.info.userInfo = resp.data
-          console.log(this.info.userInfo)
           if (this.info.userInfo.wallet.balance === null || this.info.userInfo.wallet.balance === 0 || this.info.userInfo.wallet.balance === undefined) {
             this.info.userInfo.wallet.balance =  "00, 00"
           } else {
@@ -512,7 +511,7 @@
           }
           this.isAuth = true;
         }).catch(() => {
-          this.isAuth = true;
+          this.isAuth = false;
         })
       }
       if (localStorage.getItem('lang') === null) {
@@ -535,6 +534,11 @@
       }
     },
     methods: {
+      goToMain() {
+        if (this.$route.fullPath !== '/') {
+          this.$router.push('/')
+        }
+      },
       homePage() {
         if (this.$route.path !== '/') this.$router.push('/')
       },

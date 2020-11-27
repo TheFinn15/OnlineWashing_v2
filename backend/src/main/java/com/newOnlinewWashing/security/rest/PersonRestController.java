@@ -1,6 +1,10 @@
 package com.newOnlinewWashing.security.rest;
 
+import com.newOnlinewWashing.models.Draft;
+import com.newOnlinewWashing.models.Machine;
 import com.newOnlinewWashing.models.Wallet;
+import com.newOnlinewWashing.repo.DraftRepo;
+import com.newOnlinewWashing.repo.MachineRepo;
 import com.newOnlinewWashing.repo.WalletRepo;
 import com.newOnlinewWashing.security.model.Person;
 import com.newOnlinewWashing.security.repo.PersonRepo;
@@ -13,10 +17,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.Mac;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -25,12 +31,47 @@ public class PersonRestController {
     private PersonRepo userRepository;
     @Autowired
     private WalletRepo walletRepo;
+    @Autowired
+    private MachineRepo machineRepo;
+    @Autowired
+    private DraftRepo draftRepo;
 
     private final PersonService userService;
 
 
     public PersonRestController(PersonService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/persons/recommends")
+    public ResponseEntity<Object> getRecomendForUser() {
+        ArrayList<Object> info = new ArrayList<>();
+        // Авторизованный юзер
+        Person authUser = userService.getUserWithAuthorities().get();
+        Person userToChange = userRepository.findByLogin(authUser.getLogin());
+        // списки для рекомендаций: все машини, заказанные машини и добавки к стиркам
+        List<Machine> machines = machineRepo.findAll();
+        List<Machine> usedMachine = new ArrayList<>();
+        List<String> usedAdditional = new ArrayList<>();
+        // сбор данных для рекомендаций
+        draftRepo.findAll().stream().forEach(i -> {
+            if (i.getPerson().getId().equals(userToChange.getId())) {
+                usedMachine.add(i.getMachine());
+                for(int j=0;j<i.getAdditional().stream().count();j++) {
+                    usedAdditional.add(i.getAdditional().get(j));
+                }
+            }
+        });
+
+        usedMachine.addAll(machines);
+        List<Machine> resMachines = usedMachine.stream().distinct().collect(Collectors.toList());
+
+        info.add(userToChange);
+        info.add(resMachines);
+        info.add(usedAdditional);
+
+
+        return new ResponseEntity<>(info, HttpStatus.OK);
     }
 
     @GetMapping("/persons")

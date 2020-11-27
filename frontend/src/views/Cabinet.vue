@@ -211,7 +211,7 @@
                                       </v-row>
                                     </v-col>
                                   </v-row>
-                                  <v-btn block color="indigo" outlined @click="doPayCreditCard">
+                                  <v-btn block color="indigo" outlined @click="doDonateCreditCard">
                                     {{curLocale.tabItems[0].balance.btnTitle}}
                                   </v-btn>
                                 </v-container>
@@ -810,8 +810,8 @@ export default {
     }
   },
   methods: {
-    doPayCreditCard() {
-
+    doDonateCreditCard() {
+      
     },
     reFormateDate() {
       const dates = this.balanceForm.chosenDate.split('-')
@@ -844,8 +844,6 @@ export default {
       if (resp.data !== null) {
         this.info.userInfo = resp.data
         this.authSuccess = true;
-        console.log(this.info.userInfo)
-        console.log(resp.data)
         axios({
           url: `http://${ip}:${port}/api/drafts`,
           method: 'GET',
