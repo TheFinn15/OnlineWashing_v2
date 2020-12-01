@@ -30,7 +30,7 @@
             v-bind="attrs"
             outlined
             rounded
-            title="Ваша корзина"
+            :title="curLocale.machines.cart.title"
             elevation="10"
         >
           <v-icon>
@@ -41,10 +41,10 @@
       <v-card style="overflow-y: auto; max-height: 340px">
         <v-card-title style="justify-content: center; display: flex">
           <v-badge color="indigo" :content="cartItems.length">
-            Ваша корзина
+            {{curLocale.machines.cart.title}}
           </v-badge>
           <v-spacer></v-spacer>
-          <v-btn icon title="Очистить всю корзину" @click="clearCart">
+          <v-btn icon :title="curLocale.machines.cart.removeTip" @click="clearCart">
             <v-icon>
               remove_shopping_cart
             </v-icon>
@@ -98,7 +98,17 @@ export default {
                 'Error of order',
                 'You already ordered this machine!'
             ],
-            btnTitle: 'To order'
+            btnTitle: 'To order',
+            cart: {
+              title: 'Your cart',
+              removeTip: 'Clear all cart',
+              labels: [
+                  'Description:',
+                  'Status:',
+                  'L.',
+                  'UAH'
+              ]
+            }
           }
         },
         'ru-RU': {
@@ -117,7 +127,17 @@ export default {
               'Ошибка заказа',
               'Вы уже заказали эту машину!'
             ],
-            btnTitle: 'Заказать'
+            btnTitle: 'Заказать',
+            cart: {
+              title: 'Ваша корзина',
+              removeTip: 'Очистить всю корзину',
+              labels: [
+                'Описание:',
+                'Статус:',
+                'л.',
+                'ГРН'
+              ]
+            }
           }
         },
         'ua-UA': {
@@ -136,7 +156,17 @@ export default {
               'Помилка при замовленні',
               'Ви вже замовили цю машину!'
             ],
-            btnTitle: 'Замовити'
+            btnTitle: 'Замовити',
+            cart: {
+              title: 'Ваш кошук',
+              removeTip: 'Очистити весь кошик',
+              labels: [
+                'Опис:',
+                'Статус:',
+                'л.',
+                'ГРН'
+              ]
+            }
           }
         }
       },

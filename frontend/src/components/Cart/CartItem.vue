@@ -8,13 +8,13 @@
         <v-menu open-on-hover offset-y>
           <template v-slot:activator="{on, attrs}">
             <v-card-title v-on="on" v-bind="attrs">
-              {{item.name}} {{item.capacity}} л
+              {{item.name}} {{item.capacity}} {{locales.machines.cart.labels[2]}}
             </v-card-title>
           </template>
           <v-card>
             <v-card-text>
-              <b>Описание:</b> {{item.description}} <br>
-              <b>Статус:</b> {{item.status}}
+              <b>{{locales.machines.cart.labels[0]}}</b> {{item.description}} <br>
+              <b>{{locales.machines.cart.labels[1]}}</b> {{item.status}}
             </v-card-text>
           </v-card>
         </v-menu>
@@ -29,7 +29,7 @@
             </v-btn>
           </v-col>
           <v-col cols="12">
-            {{item.price}} UAH
+            {{item.price}} {{locales.machines.cart.labels[3]}}
           </v-col>
         </v-row>
       </v-col>
