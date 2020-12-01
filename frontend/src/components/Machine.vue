@@ -46,7 +46,7 @@
         </v-card-text>
       </v-card>
     </v-menu>
-    <v-btn block color="indigo" outlined @click="orderMachine">{{locales.machines.btnTitle}}</v-btn>
+    <v-btn block color="indigo" outlined @click="doShowDialogOrder">{{locales.machines.btnTitle}}</v-btn>
     <v-snackbar
         top
         v-model="alertSuccess"
@@ -95,6 +95,41 @@
         </v-btn>
       </template>
     </v-snackbar>
+    <v-dialog v-model="showBuyDialog" width="450">
+      <v-card>
+        <v-card-title>
+          Вы уверены в заказе ?
+        </v-card-title>
+        <v-card-text>
+          Далее заказ будет помещен в корзину.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text color="red">
+            Отменить
+          </v-btn>
+          <v-btn text @click="orderMachine" color="success">
+            В корзину
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="authIsMust" width="450">
+      <v-card>
+        <v-card-title>
+          Для покупки войдите в систему
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-btn color="indigo" to="/register">
+            Регистрация
+          </v-btn>
+          <v-btn color="deep-purple" to="/auth">
+            Войти
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -102,66 +137,63 @@
 const [ip, port, axios] = ['localhost', '25016', require('axios')]
 export default {
   name: "Machine",
-  props: {
-    machine: {
-      type: Object,
-      required: true
-    },
-    locales: {
-      type: Object,
-      required: true
-    }
-  },
+  props: ['machine', 'locales', 'updateCart'],
   data() {
     return {
       activeInfoProduct: false,
       alertErr: false,
       alertSuccess: false,
       machineisOrdered: false,
+      showBuyDialog: false,
+      authIsMust: false
     }
   },
   methods: {
+    doShowDialogOrder() {
+      if (localStorage['uid'] !== undefined) {
+        this.showBuyDialog = true;
+      } else {
+        this.authIsMust = true
+      }
+    },
     orderMachine() {
       // send PUT
       if (!(this.alertSuccess || this.alertErr || this.machineisOrdered)) {
+        this.showBuyDialog = false
         axios({
-          url: `http://${ip}:${port}/api/persons/current`,
+          url: `http://${ip}:${port}/api/persons`,
           method: 'GET',
           headers: {
-            Authorization: localStorage['uid']
+            Authorization: 'Bearer ' + localStorage['uid']
           }
         }).then(resp => {
-          let req = new XMLHttpRequest()
-          req.responseType = 'json'
-          req.open('GET', `http://${ip}:${port}/api/persons/${resp.data.id}`)
-          req.send()
-          req.onerror = (err) => {
-            console.error(err)
-          }
-          req.onload = () => {
-            let machines = []
-            let oldMachine = req.response.machine
-            if (oldMachine.length > 0) {
-              for (let i=0;i<oldMachine.length;i++) {
-                if (oldMachine[i].id === this.machine.id) {
-                  this.machineisOrdered = true;
-                  throw "Machine already ordered.";
-                }
-                machines.push({id: oldMachine[i].id})
+          let machines = []
+          let oldMachine = resp.data.machine
+          if (oldMachine.length > 0) {
+            for (let i=0;i<oldMachine.length;i++) {
+              if (oldMachine[i].id === this.machine.id) {
+                this.machineisOrdered = true;
+                throw "Machine already ordered.";
               }
+              machines.push({id: oldMachine[i].id})
             }
-            machines.push({id: this.machine.id})
-            axios.put(`http://${ip}:${port}/api/persons/${resp.data.id}`, {
-              machine: machines
-            })
-                .then(resp => {
-                  console.info(resp)
-                  this.alertSuccess = true
-                })
-                .catch(() => {
-                  this.alertErr = true;
-                })
           }
+          machines.push({id: this.machine.id})
+          axios.put(`http://${ip}:${port}/api/persons`, {
+            machine: machines
+          }, {
+            headers: {
+              Authorization: 'Bearer ' + localStorage['uid']
+            }
+          }).then(resp => {
+            this.alertSuccess = true
+            this.updateCart({
+              items: resp.data.machine
+            })
+
+          }).catch(() => {
+            this.alertErr = true;
+          })
         }).catch(() => {
           this.alertErr = true;
         })

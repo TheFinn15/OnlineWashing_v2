@@ -16,14 +16,55 @@
     <v-card style="margin: 2% 5% 0 5%" flat>
       <v-card-title v-if="!recomends">{{curLocale.machines.cardTitle}}</v-card-title>
       <v-card-title v-else>{{curLocale.machines.recomendTitle}}</v-card-title>
-      <MachineList :locales="curLocale" :machines="info.machines" v-if="!recomends"/>
-      <MachineList :locales="curLocale" :machines="recomendsInfo.machines" v-else/>
+      <MachineList :locales="curLocale" :machines="info.machines" v-if="!recomends" :update-cart="updateCartBuyItem"/>
+      <MachineList :locales="curLocale" :machines="recomendsInfo.machines" v-else :update-cart="updateCartBuyItem"/>
     </v-card>
+    <v-dialog v-model="showCartDialog" max-width="650" v-if="cartItems.length > 0">
+      <template v-slot:activator="{on, attrs}">
+        <v-btn
+            icon
+            x-large
+            color="success"
+            bottom right absolute
+            v-on="on"
+            v-bind="attrs"
+            outlined
+            rounded
+            title="Ваша корзина"
+            elevation="10"
+        >
+          <v-icon>
+            shopping_cart
+          </v-icon>
+        </v-btn>
+      </template>
+      <v-card style="overflow-y: auto; max-height: 340px">
+        <v-card-title style="justify-content: center; display: flex">
+          <v-badge color="indigo" :content="cartItems.length">
+            Ваша корзина
+          </v-badge>
+          <v-spacer></v-spacer>
+          <v-btn icon title="Очистить всю корзину" @click="clearCart">
+            <v-icon>
+              remove_shopping_cart
+            </v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-divider></v-divider>
+        <CartItemList
+            :items="cartItems"
+            :locales="curLocale"
+            :all-cart="cartItems"
+            :update-cart-remove-item="updateCartRemoveItem"
+        />
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
 import MachineList from "@/components/MachineList";
+import CartItemList from "@/components/Cart/CartItemList";
 const axios = require('axios')
 const ip =  "localhost"
 const port = "25016"
@@ -31,6 +72,7 @@ const port = "25016"
 export default {
   name: "Home",
   components: {
+    CartItemList,
     MachineList
   },
   data() {
@@ -99,15 +141,48 @@ export default {
         }
       },
       searchVal: '',
-      searchItems: null,
+      showCartDialog: false,
       recomends: false,
       recomendsInfo: {
         machines: [],
         additional: []
-      }
+      },
+      cartItems: []
     }
   },
   methods: {
+    updateCartRemoveItem(info) {
+      this.cartItems = info.items
+    },
+    updateCartBuyItem(info) {
+      for (let item of info.items) {
+        this.cartItems.push(item)
+      }
+      const filteredArr = this.cartItems.reduce((acc, current) => {
+        const x = acc.find(item => item.id === current.id);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
+        }
+      }, []);
+      this.cartItems = filteredArr
+    },
+    clearCart() {
+      axios({
+        method: 'PUT',
+        url: `http://${ip}:${port}/api/persons`,
+        data: {
+          machine: []
+        },
+        headers: {
+          Authorization: 'Bearer ' + localStorage['uid']
+        }
+      }).then(() => {
+        this.cartItems = []
+        this.showCartDialog = false
+      })
+    },
     clearSearch() {
       this.searchVal = ''
       axios.get(`http://${ip}:${port}/api/machines`)
@@ -115,11 +190,41 @@ export default {
     },
     searchMachine() {
       if (this.searchVal !== '') {
-        axios.get(`http://${ip}:${port}/api/machines`)
-            .then(resp => (this.info.machines = resp.data.filter(i => new RegExp(this.searchVal.toLowerCase()).test(i.name.toLowerCase()))))
+        if (this.recomends === true) {
+          axios.get(`http://${ip}:${port}/api/persons/recommends`, {
+            headers: {
+              Authorization: 'Bearer ' + localStorage['uid']
+            }
+          })
+              .then(resp => {
+                console.log(this.searchVal.toLowerCase())
+                let regex = new RegExp(this.searchVal.toLowerCase(), 'i')
+                this.recomendsInfo.machines = resp.data.filter(i => regex.test(i.name.toLowerCase()))
+              })
+        } else {
+          axios.get(`http://${ip}:${port}/api/machines`)
+              .then(resp => {
+                this.info.machines = resp.data.filter(i => {
+                  console.log(i.name.toLowerCase())
+                  return new RegExp(this.searchVal.toLowerCase(), 'i').test(i.name.toLowerCase())
+                })
+              })
+        }
       } else {
-        axios.get(`http://${ip}:${port}/api/machines`)
-            .then(resp => (this.info.machines = resp.data))
+        if (this.recomends === true) {
+          axios.get(`http://${ip}:${port}/api/persons/recommends`, {
+            headers: {
+              Authorization: 'Bearer ' + localStorage['uid']
+            }
+          })
+              .then(resp => {
+                this.recomendsInfo.machines = resp.data[1]
+                this.recomendsInfo.additional = resp.data[2]
+              })
+        } else {
+          axios.get(`http://${ip}:${port}/api/machines`)
+              .then(resp => (this.info.machines = resp.data))
+        }
       }
     }
   },
@@ -153,6 +258,17 @@ export default {
           this.info.machines = resp.data
         })
       })
+    if (localStorage['uid'] !== undefined) {
+      axios({
+        method: 'GET',
+        url: `http://${ip}:${port}/api/persons`,
+        headers: {
+          Authorization: 'Bearer ' + localStorage['uid']
+        }
+      }).then(resp => {
+        this.cartItems = resp.data.machine
+      })
+    }
   }
 }
 </script>

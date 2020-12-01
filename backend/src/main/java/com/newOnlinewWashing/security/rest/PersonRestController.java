@@ -128,6 +128,9 @@ public class PersonRestController {
         if(user.getfName() != null) {
             userToChange.setfName(user.getfName());
         }
+        if (user.getMachine() != null) {
+            userToChange.setMachine(user.getMachine());
+        }
         if(user.getEmail() != null) {
             userToChange.setEmail(user.getEmail());
         }

@@ -3,7 +3,9 @@
     <v-row>
       <v-col cols="2" v-for="(item, i) in machines" :key="i">
         <Machine :locales="locales"
-                 v-bind:machine="item"/>
+                 v-bind:machine="item"
+                 :update-cart="updateCart"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -17,7 +19,7 @@ export default {
   components: {
     Machine
   },
-  props: ['machines', 'locales']
+  props: ['machines', 'locales', 'updateCart']
 }
 </script>
 
