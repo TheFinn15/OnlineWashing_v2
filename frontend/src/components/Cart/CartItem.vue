@@ -53,7 +53,9 @@ export default {
   props: ['item', 'locales', 'allCart', 'updateCartRemoveItem', 'addAdditional'],
   methods: {
     doFillAdditional() {
-      console.log(this.item)
+      this.addAdditional({
+        items: this.item.additional
+      })
     },
     delCartItem() {
       let newItems = this.allCart.filter(i => i.id !== this.item.id)
