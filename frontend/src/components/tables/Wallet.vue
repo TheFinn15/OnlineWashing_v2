@@ -15,35 +15,37 @@
     <v-list-group sub-group no-action color="indigo">
       <template v-slot:activator>
         <v-list-item-content>
-          <v-list-item-title>Информация о кошельке</v-list-item-title>
+          <v-list-item-title>
+            {{locale.tabs.tab1.context.fullInfoTable.wallet.title}}
+          </v-list-item-title>
         </v-list-item-content>
       </template>
       <v-list-item>
         <v-list-group sub-group no-action color="indigo" v-if="wallet.histories !== undefined">
           <template v-slot:activator>
             <v-list-item-title>
-              История пополнений кошелька
+              {{locale.tabs.tab1.context.fullInfoTable.wallet.labels[0]}}
             </v-list-item-title>
           </template>
           <div>
             <v-list-item v-for="(item, i) in wallet.histories" :key="i">
               <v-list-item-title>
                 ID: {{item.id}} <br>
-                Сумма пополнений: {{item.sum}} <br>
-                Дата пополнений: {{item.date}} <br>
-                Дата изменения записи: {{item.lastUpdateRow}}
+                {{locale.tabs.tab1.context.fullInfoTable.wallet.labels[1]}} {{item.sum}} <br>
+                {{locale.tabs.tab1.context.fullInfoTable.wallet.labels[2]}} {{item.date}} <br>
+                {{locale.tabs.tab1.context.fullInfoTable.wallet.labels[3]}} {{item.lastUpdateRow}}
               </v-list-item-title>
             </v-list-item>
           </div>
         </v-list-group>
         <v-list-item v-else>
           <v-list-item-title>
-            Пополнения отсутствуют
+            {{locale.tabs.tab1.context.fullInfoTable.wallet.notFound}}
           </v-list-item-title>
         </v-list-item>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Дата обновления записи: {{wallet.lastUpdateRow}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.wallet.labels[4]}} {{wallet.lastUpdateRow}}</v-list-item-title>
       </v-list-item>
     </v-list-group>
     <!---------------------------------------------------------------------------------->
@@ -53,7 +55,7 @@
 <script>
 export default {
   name: "Wallet",
-  props: ['wallet', 'modeEdit', 'modeDel', 'updater'],
+  props: ['wallet', 'modeEdit', 'modeDel', 'updater', 'locales'],
   methods: {
     showEditForm() {
       this.updater(

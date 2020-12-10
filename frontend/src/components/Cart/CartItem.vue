@@ -8,16 +8,24 @@
         <v-menu open-on-hover offset-y>
           <template v-slot:activator="{on, attrs}">
             <v-card-title v-on="on" v-bind="attrs">
-              {{item.name}} {{item.capacity}} {{locales.machines.cart.labels[2]}}
+              {{item.name}} {{item.capacity}} {{locales.machines.cart.cartLabels[2]}}
             </v-card-title>
           </template>
           <v-card>
             <v-card-text>
-              <b>{{locales.machines.cart.labels[0]}}</b> {{item.description}} <br>
-              <b>{{locales.machines.cart.labels[1]}}</b> {{item.status}}
+              <b>{{locales.machines.cart.cartLabels[0]}}</b> {{item.description}} <br>
+              <b>{{locales.machines.cart.cartLabels[1]}}</b> {{item.status}}
             </v-card-text>
           </v-card>
         </v-menu>
+        <v-select
+            :label="locales.machines.cart.cartLabels[4]"
+            multiple
+            outlined
+            v-model="item['additional']"
+            @input="doFillAdditional"
+            :items="['s', 'dd']"
+        ></v-select>
       </v-col>
       <v-col>
         <v-row>
@@ -29,7 +37,7 @@
             </v-btn>
           </v-col>
           <v-col cols="12">
-            {{item.price}} {{locales.machines.cart.labels[3]}}
+            {{item.price}} {{locales.machines.cart.cartLabels[3]}}
           </v-col>
         </v-row>
       </v-col>
@@ -42,8 +50,11 @@ const [ip, port, axios] = ['localhost', '25016', require('axios')]
 
 export default {
   name: "CartItem",
-  props: ['item', 'locales', 'allCart', 'updateCartRemoveItem'],
+  props: ['item', 'locales', 'allCart', 'updateCartRemoveItem', 'addAdditional'],
   methods: {
+    doFillAdditional() {
+      console.log(this.item)
+    },
     delCartItem() {
       let newItems = this.allCart.filter(i => i.id !== this.item.id)
       axios({

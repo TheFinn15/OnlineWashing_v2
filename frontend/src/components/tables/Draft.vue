@@ -15,34 +15,36 @@
     <v-list-group sub-group no-action color="indigo">
       <template v-slot:activator>
         <v-list-item-content>
-          <v-list-item-title>Информация о чеке</v-list-item-title>
+          <v-list-item-title>
+            {{locale.tabs.tab1.context.fullInfoTable.draft.title}}
+          </v-list-item-title>
         </v-list-item-content>
       </template>
       <v-list-item>
         <v-list-group sub-group no-action color="indigo">
           <template v-slot:activator>
             <v-list-item-title>
-              Пользователь: ID: {{draft.person.id}} | {{draft.person.fName}} {{draft.person.sName}}
+              {{locale.tabs.tab1.context.fullInfoTable.draft.person[0]}} ID: {{draft.person.id}} | {{draft.person.fName}} {{draft.person.sName}}
             </v-list-item-title>
           </template>
           <v-list-item>
             <v-list-item-title>
-              Текущий баланс: {{draft.person.wallet.balance}} UAH
+              {{locale.tabs.tab1.context.fullInfoTable.draft.person[1]}} {{draft.person.wallet.balance}} UAH
             </v-list-item-title>
           </v-list-item>
           <v-list-item>
             <v-list-item-title>
-              Логин: {{draft.person.login}}
+              {{locale.tabs.tab1.context.fullInfoTable.draft.person[2]}} {{draft.person.login}}
             </v-list-item-title>
           </v-list-item>
           <v-list-item>
             <v-list-item-title>
-              E-mail: {{draft.person.email}}
+              {{locale.tabs.tab1.context.fullInfoTable.draft.person[3]}} {{draft.person.email}}
             </v-list-item-title>
           </v-list-item>
           <v-list-item>
             <v-list-item-title>
-              Телефон: {{draft.person.phone}}
+              {{locale.tabs.tab1.context.fullInfoTable.draft.person[4]}} {{draft.person.phone}}
             </v-list-item-title>
           </v-list-item>
         </v-list-group>
@@ -51,45 +53,45 @@
         <v-list-group sub-group no-action color="indigo">
           <template v-slot:activator>
             <v-list-item-title>
-              Стиральная машина: ID: {{draft.machine.id}} | {{draft.machine.name}} | {{draft.machine.capacity}}
+              {{locale.tabs.tab1.context.fullInfoTable.draft.machine[0]}} ID: {{draft.machine.id}} | {{draft.machine.name}} | {{draft.machine.capacity}}
             </v-list-item-title>
           </template>
           <v-list-item>
             <v-list-item-title>
-              Цена за 1 кг: {{draft.machine.price}}
+              {{locale.tabs.tab1.context.fullInfoTable.draft.machine[1]}} {{draft.machine.price}}
             </v-list-item-title>
           </v-list-item>
           <v-list-item>
             <v-list-item-title>
-              Описание: {{draft.machine.description}}
+              {{locale.tabs.tab1.context.fullInfoTable.draft.machine[2]}} {{draft.machine.description}}
             </v-list-item-title>
           </v-list-item>
           <v-list-item>
             <v-list-item-title>
-              Текущий статус: {{draft.machine.status}}
+              {{locale.tabs.tab1.context.fullInfoTable.draft.machine[3]}} {{draft.machine.status}}
             </v-list-item-title>
           </v-list-item>
         </v-list-group>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Уплаченная цена: {{draft.price}} UAH</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.draft.labels[0]}} {{draft.price}} UAH</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Объем вещей: {{draft.volume}} кг</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.draft.labels[1]}} {{draft.volume}} кг</v-list-item-title>
       </v-list-item>
       <v-list-item>
         <v-list-item-title>
-          Вид оплаты: {{draft.paymentType}}
+          {{locale.tabs.tab1.context.fullInfoTable.draft.labels[2]}} {{draft.paymentType}}
         </v-list-item-title>
-        <v-list-item-subtitle v-if="draft.paymentType === 'Картой'">
-          Кредитная карта: {{draft.creditCard}}
+        <v-list-item-subtitle v-if="draft.paymentType === locale.tabs.tab1.context.fullInfoTable.draft.labels[3]">
+          {{locale.tabs.tab1.context.fullInfoTable.draft.labels[4]}} {{draft.creditCard}}
         </v-list-item-subtitle>
       </v-list-item>
       <v-list-item>
         <v-list-group sub-group no-action color="indigo">
           <template v-slot:activator>
             <v-list-item-title>
-              Хим. добавки к стирке
+              {{locale.tabs.tab1.context.fullInfoTable.draft.labels[5]}}
             </v-list-item-title>
           </template>
           <v-list-item v-for="(item, i) in draft.additional" :key="i">
@@ -100,7 +102,7 @@
         </v-list-group>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Дата обновления записи: {{draft.lastUpdateRow}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.draft.labels[6]}} {{draft.lastUpdateRow}}</v-list-item-title>
       </v-list-item>
     </v-list-group>
     <!---------------------------------------------------------------------------------->
@@ -110,7 +112,7 @@
 <script>
 export default {
   name: "Draft",
-  props: ['draft', 'modeEdit', 'modeDel', 'updater'],
+  props: ['draft', 'modeEdit', 'modeDel', 'updater', 'locales'],
   methods: {
     showEditForm() {
       this.updater(

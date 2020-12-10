@@ -1,6 +1,7 @@
 <template>
   <v-list>
     <History
+        :locales="locales"
         :updater="updater"
         :show-edit="showEdit"
         :show-del="showDel"
@@ -19,7 +20,7 @@ import History from "@/components/tables/History";
 export default {
   name: "HistoryList",
   components: {History},
-  props: ['tableInfo', 'modeEdit', 'modeDel', 'itemInfo', 'showEdit', 'showDel', 'updater']
+  props: ['tableInfo', 'modeEdit', 'modeDel', 'itemInfo', 'showEdit', 'showDel', 'updater', 'locales']
 }
 </script>
 

@@ -14,21 +14,23 @@
     <v-list-group sub-group no-action color="indigo">
       <template v-slot:activator>
         <v-list-item-content>
-          <v-list-item-title>Информация о пополнение</v-list-item-title>
+          <v-list-item-title>
+            {{locale.tabs.tab1.context.fullInfoTable.histories.title}}
+          </v-list-item-title>
         </v-list-item-content>
       </template>
       <v-list-item>
         <v-card-text>
-          Сумма оплаты: {{history.sum}} UAH <br>
-          Вид оплаты: {{history.paymentType}} <br>
-          <span v-if="history.paymentType === 'Кредитной картой'">
-            Кредитная карта: {{history.creditCard}} <br>
+          {{locale.tabs.tab1.context.fullInfoTable.histories.labels[0]}} {{history.sum}} UAH <br>
+          {{locale.tabs.tab1.context.fullInfoTable.histories.labels[1]}} {{history.paymentType}} <br>
+          <span v-if="history.paymentType === locale.tabs.tab1.context.fullInfoTable.histories.labels[2]">
+            {{locale.tabs.tab1.context.fullInfoTable.histories.labels[2]}} {{history.creditCard}} <br>
           </span>
-          Дата пополнения: {{history.date}}
+          {{locale.tabs.tab1.context.fullInfoTable.histories.labels[3]}} {{history.date}}
         </v-card-text>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Дата обновления записи: {{history.lastUpdateRow}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.histories.labels[4]}} {{history.lastUpdateRow}}</v-list-item-title>
       </v-list-item>
     </v-list-group>
   </v-list-group>
@@ -37,7 +39,7 @@
 <script>
 export default {
   name: "History",
-  props: ['history', 'modeEdit', 'modeDel', 'updater'],
+  props: ['history', 'modeEdit', 'modeDel', 'updater', 'locales'],
   methods: {
     showEditForm() {
       this.updater(

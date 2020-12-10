@@ -10,6 +10,12 @@
   "dependencies": {
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
+    "dayjs": "^1.9.6",
+    "jose": "^3.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "timezone-js": "^0.4.13",
+    "to-unix-timestamp": "github:segmentio/to-unix-timestamp",
+    "unix-timestamp": "^0.2.0",
     "vue": "^2.6.11",
     "vue-router": "^3.4.3",
     "vuetify": "^2.2.11"

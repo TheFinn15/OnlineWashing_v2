@@ -15,23 +15,25 @@
     <v-list-group sub-group no-action color="indigo">
       <template v-slot:activator>
         <v-list-item-content>
-          <v-list-item-title>Информация об акции</v-list-item-title>
+          <v-list-item-title>
+            {{locale.tabs.tab1.context.fullInfoTable.stock.title}}
+          </v-list-item-title>
         </v-list-item-content>
       </template>
       <v-list-item>
-        <v-list-item-title>Название акции: {{stock.name}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.stock.labels[0]}} {{stock.name}}</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Спонсор: {{stock.sponsor}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.stock.labels[1]}} {{stock.sponsor}}</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Скидка: {{stock.discount}} %</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.stock.labels[2]}} {{stock.discount}} %</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Срок действия до: {{stock.lastTerm}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.stock.labels[3]}} {{stock.lastTerm}}</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Дата обновления записи: {{stock.lastUpdateRow}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.stock.labels[4]}} {{stock.lastUpdateRow}}</v-list-item-title>
       </v-list-item>
     </v-list-group>
     <!---------------------------------------------------------------------------------->
@@ -41,7 +43,7 @@
 <script>
 export default {
   name: "Stock",
-  props: ['stock', 'modeEdit', 'modeDel', 'updater'],
+  props: ['stock', 'modeEdit', 'modeDel', 'updater', 'locales'],
   methods: {
     showEditForm() {
       this.updater(

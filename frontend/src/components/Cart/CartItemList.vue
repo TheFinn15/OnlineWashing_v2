@@ -6,6 +6,7 @@
           :locales="locales"
           :all-cart="allCart"
           :update-cart-remove-item="updateCartRemoveItem"
+          :add-additional="addAdditional"
       />
     </v-card>
   </div>
@@ -16,7 +17,7 @@ import CartItem from "@/components/Cart/CartItem";
 export default {
   name: "CartItemList",
   components: {CartItem},
-  props: ['items', 'locales', 'allCart', 'updateCartRemoveItem']
+  props: ['items', 'locales', 'allCart', 'updateCartRemoveItem', 'addAdditional']
 }
 </script>
 

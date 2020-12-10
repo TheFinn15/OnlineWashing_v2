@@ -15,23 +15,25 @@
     <v-list-group sub-group no-action color="indigo">
       <template v-slot:activator>
         <v-list-item-content>
-          <v-list-item-title>Информация о стиральной машине</v-list-item-title>
+          <v-list-item-title>
+            {{locale.tabs.tab1.context.fullInfoTable.machine.machine.title}}
+          </v-list-item-title>
         </v-list-item-content>
       </template>
       <v-list-item>
-        <v-list-item-title>Процесс стирки: {{machine.percentReady}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.machine.machine.labels[0]}} {{machine.percentReady}}</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Описание: {{machine.description}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.machine.machine.labels[1]}} {{machine.description}}</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Статус машини: {{machine.status}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.machine.machine.labels[2]}} {{machine.status}}</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Цена за 1 кг: {{machine.price}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.machine.machine.labels[3]}} {{machine.price}}</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Дата обновления записи: {{machine.lastUpdateRow}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.machine.machine.labels[4]}} {{machine.lastUpdateRow}}</v-list-item-title>
       </v-list-item>
     </v-list-group>
     <!--Отображение скидок на стиральных машин-->
@@ -42,23 +44,23 @@
         </v-list-item-content>
       </template>
       <v-list-item>
-        <v-list-item-title>Спонсор: {{machine.stock.sponsor}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.machine.stock.labels[0]}} {{machine.stock.sponsor}}</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Сумма скидки: {{machine.stock.discount}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.machine.stock.labels[1]}} {{machine.stock.discount}}</v-list-item-title>
       </v-list-item>
       <v-list-item>
-        <v-list-item-title>Дата измений строки: {{person.machine.lastUpdateRow}}</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.machine.stock.labels[2]}} {{person.machine.lastUpdateRow}}</v-list-item-title>
       </v-list-item>
     </v-list-group>
     <v-list-group sub-group no-action v-else>
       <template v-slot:activator>
         <v-list-item-content>
-          <v-list-item-title>Информация о скидках на стиральные машини</v-list-item-title>
+          <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.machine.stock.title}}</v-list-item-title>
         </v-list-item-content>
       </template>
       <v-list-item>
-        <v-list-item-title>Машина не имеет скидок</v-list-item-title>
+        <v-list-item-title>{{locale.tabs.tab1.context.fullInfoTable.machine.stock.notFound}}</v-list-item-title>
       </v-list-item>
     </v-list-group>
   </v-list-group>
@@ -67,7 +69,7 @@
 <script>
 export default {
   name: "Machine",
-  props: ['machine', 'modeEdit', 'modeDel', 'updater'],
+  props: ['machine', 'modeEdit', 'modeDel', 'updater', 'locales'],
   methods: {
     showEditForm() {
       this.updater(

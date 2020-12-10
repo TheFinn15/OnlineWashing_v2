@@ -13,10 +13,6 @@ const routes = [
     component: () => import('@/views/Cabinet')
   },
   {
-    path: '/balance',
-    component: () => import('@/views/Balance')
-  },
-  {
     path: '/admin/cabinet',
     component: () => import('@/views/AdminCabinet')
   },

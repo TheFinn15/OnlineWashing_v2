@@ -11,6 +11,7 @@
         v-for="(item, i) in tableInfo"
         :key="i"
         color="indigo"
+        :locales="locales"
     />
   </v-list>
 </template>
@@ -21,7 +22,7 @@ import Machine from "@/components/tables/Machine";
 export default {
   name: "MachineList",
   components: {Machine},
-  props: ['tableInfo', 'modeEdit', 'modeDel', 'itemInfo', 'showEdit', 'showDel', 'updater']
+  props: ['tableInfo', 'modeEdit', 'modeDel', 'itemInfo', 'showEdit', 'showDel', 'updater', 'locales']
 }
 </script>
 
