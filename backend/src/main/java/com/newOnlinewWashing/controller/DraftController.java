@@ -92,7 +92,8 @@ public class DraftController {
             if (draft.getDate() == null) draft.setDate(dateTime.format(formatter));
             if (!draft.getPaymentType().equals("credit")) draft.setCreditCard("оплачено без карты");
             draft.setLastUpdateRow(dateTime.format(formatter));
-            return draftRepo.save(draft);
+            draftRepo.save(draft);
+            return new ResponseEntity<>(draftRepo.findById(draft.getId()), HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<Object>("Проверьте все важные поля либо попробуйте позже.", HttpStatus.BAD_REQUEST);
         }

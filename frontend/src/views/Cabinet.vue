@@ -395,6 +395,7 @@
                   <v-file-input
                       accept="image/png, image/jpeg, image/jpg"
                       :label="curLocale.tabItems[2].editForm.avatar"
+                      @change="loadImg"
                       prepend-icon="mdi-camera"
                   ></v-file-input>
                 </v-col>
@@ -403,38 +404,40 @@
                     <v-col>
                       <v-text-field
                           :label="curLocale.tabItems[2].editForm.fName"
-                          :placeholder="info.userInfo.fName"
+                          v-model="info.userInfo.fName"
                           outlined
                       ></v-text-field>
                       <v-text-field
                           :label="curLocale.tabItems[2].editForm.sName"
-                          :placeholder="info.userInfo.sName"
+                          v-model="info.userInfo.sName"
                           outlined
                       ></v-text-field>
                       <v-text-field
                           :label="curLocale.tabItems[2].editForm.phone"
                           :rules="phoneRules"
-                          :placeholder="info.userInfo.phone"
+                          v-model="info.userInfo.phone"
                           outlined
                       ></v-text-field>
                     </v-col>
                     <v-col>
                       <v-text-field
                           :label="curLocale.tabItems[2].editForm.login"
-                          :placeholder="info.userInfo.login"
+                          v-model="info.userInfo.login"
                           outlined
                       ></v-text-field>
                       <v-text-field
                           :label="curLocale.tabItems[2].editForm.pwd"
-                          type="password"
-                          placeholder="********"
+                          v-model="info.userInfo.pwd.length"
+                          :type="showPwd ? 'password' : 'text'"
+                          :append-icon="showPwd ? 'visibility' : 'visibility_off'"
+                          @click:append="() => (showPwd = !showPwd)"
                           outlined
                       ></v-text-field>
                       <v-text-field
                           :label="curLocale.tabItems[2].editForm.email"
                           type="email"
                           :rules="emailRules"
-                          :placeholder="info.userInfo.email"
+                          v-model="info.userInfo.email"
                           outlined
                       ></v-text-field>
                     </v-col>
@@ -448,6 +451,23 @@
               </v-row>
             </v-container>
           </form>
+          <v-snackbar v-model="alertModel"
+                      timeout="2000"
+                      transition="fab-transition"
+                      :color="alertEditSetts[0]"
+                      top
+          >
+            {{alertEditSetts[1]}}
+            <template v-slot:action="{attrs}">
+              <v-btn
+                  text
+                  v-bind="attrs"
+                  @click="alertModel = false"
+              >
+                Закрыть
+              </v-btn>
+            </template>
+          </v-snackbar>
         </v-tab-item>
       </v-tabs>
     </v-card>
@@ -468,11 +488,14 @@ export default {
   name: "Cabinet",
   data() {
     return {
+      alertModel: false,
+      alertEditSetts: ['success', ''],
       info: {
         userInfo: {
           fName: '',
           sName: '',
           login: '',
+          pwd: '',
           email: '',
           phone: '',
           machine: [],
@@ -487,7 +510,7 @@ export default {
         v => v.length === 10 || this.curLocale.tabItems[2].editForm.rulePhoneText
       ],
       emailRules: [
-        v => v.match("[a-zA-Z]+@[a-zA-Z]+[.][a-zA-Z]+") || this.curLocale.tabItems[2].editForm.ruleEmailText
+        v => v.match("[a-zA-Z]+@[a-zA-Z]+[.][a-zA-Z]+") !== null || this.curLocale.tabItems[2].editForm.ruleEmailText
       ],
       curLocale: null,
       locales: {
@@ -795,6 +818,7 @@ export default {
       menuChooseDate: false,
       payCreditCard: false,
       doCashPay: false,
+      showPwd: false,
       balanceForm: {
         chosenDate: '',
         date: '00/00',
@@ -810,6 +834,15 @@ export default {
     }
   },
   methods: {
+    loadImg(ev) {
+      let reader = new FileReader()
+      console.info(this.info.userInfo.avatar)
+      reader.onload = (e) => {
+        this.info.userInfo.avatar = e.target.result
+      }
+      console.info(this.info.userInfo.avatar)
+      reader.readAsDataURL(ev);
+    },
     doDonateCreditCard() {
       
     },
@@ -818,7 +851,22 @@ export default {
       this.balanceForm.date = `${dates[2]}/${dates[1]}`
     },
     editSettings() {
-
+      axios({
+        method: 'PUT',
+        url: `http://${ip}:${port}/api/persons`,
+        headers: {
+          Authorization: 'Bearer ' + localStorage['uid']
+        },
+        data: this.info.userInfo
+      }).then(() => {
+        this.$nextTick(() => {
+          this.alertModel = true
+          this.alertEditSetts[1] = 'Успешное редактирование'
+        })
+      }).catch(() => {
+        this.alertModel = true
+        this.alertEditSetts[1] = 'Ошибка при редактирование'
+      })
     }
   },
   beforeMount() {
@@ -843,6 +891,7 @@ export default {
     }).then(resp => {
       if (resp.data !== null) {
         this.info.userInfo = resp.data
+        this.info.userInfo.pwd = '-'
         this.authSuccess = true;
         axios({
           url: `http://${ip}:${port}/api/drafts`,
@@ -859,6 +908,40 @@ export default {
     }).catch(() => {
       this.authSuccess = false;
     })
+  },
+  updated() {
+    if (this.info.userInfo.machine[0].percentReady < 100) {
+      let inteval = setInterval(() => {
+        axios({
+          method: 'GET',
+          url: `http://${ip}:${port}/api/persons`,
+          headers: {
+            Authorization: 'Bearer ' + localStorage['uid']
+          }
+        }).then(resp => {
+          if (this.info.userInfo.machine[0].percentReady >= 98) {
+            clearInterval(inteval)
+          }
+          for (let i=0;i<resp.data.machine.length;i++) {
+            let item = resp.data.machine[i]
+            setTimeout(() => {
+              item.percentReady++;
+              axios({
+                method: 'PUT',
+                url: `http://${ip}:${port}/api/persons`,
+                headers: {
+                  Authorization: 'Bearer ' + localStorage['uid']
+                },
+                data: {
+                  machine: resp.data.machine
+                }
+              })
+              this.info.userInfo.machine[i].percentReady++;
+            }, 1000)
+          }
+        })
+      }, 4000)
+    }
   }
 }
 </script>
