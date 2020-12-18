@@ -427,9 +427,9 @@
                       ></v-text-field>
                       <v-text-field
                           :label="curLocale.tabItems[2].editForm.pwd"
-                          v-model="info.userInfo.pwd.length"
-                          :type="showPwd ? 'password' : 'text'"
-                          :append-icon="showPwd ? 'visibility' : 'visibility_off'"
+                          v-model="info.userInfo.pwd"
+                          :type="showPwd === true ? 'password' : 'text'"
+                          :append-icon="showPwd !== true ? 'visibility' : 'visibility_off'"
                           @click:append="() => (showPwd = !showPwd)"
                           outlined
                       ></v-text-field>
@@ -464,7 +464,7 @@
                   v-bind="attrs"
                   @click="alertModel = false"
               >
-                Закрыть
+                {{curLocale.tabItems[2].alert[2]}}
               </v-btn>
             </template>
           </v-snackbar>
@@ -607,7 +607,12 @@ export default {
                 btnTitle: 'EDIT',
                 rulePhoneText: 'Input correct phone number',
                 ruleEmailText: 'Input correct e-mail'
-              }
+              },
+              alert: [
+                  'Edit is success',
+                  'Error in edit',
+                  'Close'
+              ]
             }
           ],
           notFound: 'Denied to access'
@@ -707,7 +712,12 @@ export default {
                 btnTitle: 'ИЗМЕНИТЬ',
                 rulePhoneText: 'Введите коретный номер телефона',
                 ruleEmailText: 'Введите верный e-mail'
-              }
+              },
+              alert: [
+                'Изменения внесены',
+                'Ошибка при изменениях',
+                'Закрыть'
+              ]
             }
           ],
           notFound: 'Отказано в доступе'
@@ -807,7 +817,12 @@ export default {
                 btnTitle: 'ЗМІНИТИ',
                 rulePhoneText: 'Введіть коректний номер телефону',
                 ruleEmailText: 'Введіть коректний e-mail'
-              }
+              },
+              alert: [
+                'Зміни зроблені',
+                'Помилка при змінах',
+                'Зачинити'
+              ]
             }
           ],
           notFound: 'Відмовленно у доступі'
@@ -818,7 +833,7 @@ export default {
       menuChooseDate: false,
       payCreditCard: false,
       doCashPay: false,
-      showPwd: false,
+      showPwd: true,
       balanceForm: {
         chosenDate: '',
         date: '00/00',
@@ -861,11 +876,11 @@ export default {
       }).then(() => {
         this.$nextTick(() => {
           this.alertModel = true
-          this.alertEditSetts[1] = 'Успешное редактирование'
+          this.alertEditSetts[1] = this.curLocale.tabItems[2].alert[0]
         })
       }).catch(() => {
         this.alertModel = true
-        this.alertEditSetts[1] = 'Ошибка при редактирование'
+        this.alertEditSetts[1] = this.curLocale.tabItems[2].alert[1]
       })
     }
   },
@@ -891,7 +906,6 @@ export default {
     }).then(resp => {
       if (resp.data !== null) {
         this.info.userInfo = resp.data
-        this.info.userInfo.pwd = '-'
         this.authSuccess = true;
         axios({
           url: `http://${ip}:${port}/api/drafts`,
@@ -910,7 +924,7 @@ export default {
     })
   },
   updated() {
-    if (this.info.userInfo.machine[0].percentReady < 100) {
+    if (this.info.userInfo.machine[0].percentReady > 100) {
       let inteval = setInterval(() => {
         axios({
           method: 'GET',
@@ -919,7 +933,7 @@ export default {
             Authorization: 'Bearer ' + localStorage['uid']
           }
         }).then(resp => {
-          if (this.info.userInfo.machine[0].percentReady >= 98) {
+          if (this.info.userInfo.machine[0].percentReady >= 93) {
             clearInterval(inteval)
           }
           for (let i=0;i<resp.data.machine.length;i++) {
